@@ -1,3 +1,5 @@
 # gron.awk
 
-Similar to https://github.com/tomnomnom/gron but in Awk
+Similar to https://github.com/tomnomnom/gron but in Awk.
+
+Features true JSON parser in Awk. 
