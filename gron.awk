@@ -2,8 +2,6 @@
 BEGIN { init() }
 
 function init(   i,line) {
-  Trace="Trace" in ENVIRON
-
   for (i = 1; i < ARGC; i++) {
     if (IsUngron = ARGV[i]=="-u") {
       delete ARGV[i]
@@ -32,9 +30,9 @@ function init(   i,line) {
     }
 
     # ungron (gron asm -> json asm)
-#    print "Parsed: "
-#    for (i=0; i<AsmLen; i++)
-#      print Asm[i]
+    #    print "Parsed: "
+    #    for (i=0; i<AsmLen; i++)
+    #      print Asm[i]
 
     split("", AddrType)  # addr -> type
     split("", AddrValue) # addr -> value
@@ -59,12 +57,12 @@ function init(   i,line) {
       } else if ("end" == Instr) { processRecord() }
     }
     generateJsonAsm()
-#    if (Trace) print "--- JSON asm ---"
-#    for (i=0; i<JsonAsmLen; i++)
-#      print JsonAsm[i]
+    #    print "--- JSON asm ---"
+    #    for (i=0; i<JsonAsmLen; i++)
+    #      print JsonAsm[i]
 
-      # generate JSON
-#    Indent = ENVIRON["Indent"] + 0
+    # generate JSON
+    #    Indent = ENVIRON["Indent"] + 0
     Indent = 2
     for (i=0; i<Indent; i++)
       IndentStr=IndentStr " "
@@ -102,12 +100,11 @@ function init(   i,line) {
 # --- JSON ---
 function tryParseDigitOptional(res) { tryParse("0123456789", res); return 1 }
 function NUMBER(    res) {
-  return attempt("NUMBER") && checkRes("NUMBER",
-    (tryParse1("-", res) || 1) &&
+  return (tryParse1("-", res) || 1) &&
     (tryParse1("0", res) || tryParse1("123456789", res) && tryParseDigitOptional(res)) &&
     (tryParse1(".", res) && tryParseDigitOptional(res) || 1) &&
     (tryParse1("eE", res) && (tryParse1("-+",res)||1) && tryParseDigitOptional(res) || 1) &&
-    asm("number") && asm(res[0]))
+    asm("number") && asm(res[0])
 }
 function tryParseHex(res) { return tryParse1("0123456789ABCDEFabcdef", res) }
 function tryParseCharacters(res) { return tryParseCharacter(res) && tryParseCharacters(res) || 1 }
@@ -128,93 +125,79 @@ function tryParseSafeChar(res,   c) {
   return 0
 }
 function STRING(isKey,    res) {
-  return attempt("STRING" isKey) && checkRes("STRING" isKey,
-    tryParse1("\"",res) && asm(isKey ? (IsUngron ? "field" : "key") : "string") &&
+  return tryParse1("\"",res) && asm(isKey ? (IsUngron ? "field" : "key") : "string") &&
     tryParseCharacters(res) &&
     tryParse1("\"",res) &&
-    asm(res[0]))
+    asm(res[0])
 }
 function WS() {
-  return attempt("WS") && checkRes("WS", tryParse("\t\n\r ")) || 1
+  return tryParse("\t\n\r ") || 1
 }
 function VALUE() {
-  return attempt("VALUE") && checkRes("VALUE",
-    OBJECT() ||
+  return OBJECT() ||
     ARRAY()  ||
     STRING() ||
     NUMBER() ||
     tryParseExact("true") && asm("true") ||
     tryParseExact("false") && asm("false") ||
-    tryParseExact("null") && asm("null"))
+    tryParseExact("null") && asm("null")
 }
 function OBJECT() {
-  return attempt("OBJECT") && checkRes("OBJECT",
-    tryParse1("{") && asm("object") &&
-
+  return tryParse1("{") && asm("object") &&
     (WS() && tryParse1("}") ||
-
     MEMBERS() && tryParse1("}")) &&
-
-    asm("end_object"))
+    asm("end_object")
 }
 function ARRAY() {
-  return attempt("ARRAY") && checkRes("ARRAY",
-    tryParse1("[") && asm("array") &&
-
+  return tryParse1("[") && asm("array") &&
     (WS() && tryParse1("]") ||
-
     ELEMENTS() && tryParse1("]")) &&
-
-    asm("end_array"))
+    asm("end_array")
 }
 function MEMBERS() {
-  return attempt("MEMBERS") && checkRes("MEMBERS", MEMBER() && (tryParse1(",") ? MEMBERS() : 1))
+  return MEMBER() && (tryParse1(",") ? MEMBERS() : 1)
 }
 function ELEMENTS() {
-  return attempt("ELEMENTS") && checkRes("ELEMENTS", ELEMENT() && (tryParse1(",") ? ELEMENTS() : 1))
+  return ELEMENT() && (tryParse1(",") ? ELEMENTS() : 1)
 }
 function MEMBER() {
-  return attempt("MEMBER") && checkRes("MEMBER", WS() && STRING(1) && WS() && tryParse1(":") && ELEMENT())
+  return WS() && STRING(1) && WS() && tryParse1(":") && ELEMENT()
 }
 function ELEMENT() {
-  return attempt("ELEMENT") && checkRes("ELEMENT", WS() && VALUE() && WS())
+  return WS() && VALUE() && WS()
 }
 # --- GRON ---
 function STATEMENT() {
-  return attempt("STATEMENT") && checkRes("STATEMENT", PATH() && tryParse1("=") && asm("value") && VALUE_GRON())
+  return PATH() && tryParse1("=") && asm("value") && VALUE_GRON()
 }
 function PATH() {
-  return attempt("PATH") && checkRes("PATH", BARE_WORD() && SEGMENTS())
+  return BARE_WORD() && SEGMENTS()
 }
 function BARE_WORD(    word) {
-  return attempt("BARE_WORD") && checkRes("BARE_WORD",
-    tryParse1("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_", word) &&
+  return tryParse1("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_", word) &&
     (tryParse( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789", word) || 1) &&
-    asm("field") && asm("\"" word[0] "\""))
+    asm("field") && asm("\"" word[0] "\"")
 }
 function SEGMENTS() {
-  return attempt("SEGMENTS") && checkRes("SEGMENTS", SEGMENT() && SEGMENTS()) || 1
+  return SEGMENT() && SEGMENTS() || 1
 }
 function SEGMENT() {
-  return attempt("SEGMENT") && checkRes("SEGMENT",
-    tryParse1(".") && BARE_WORD() ||
-    tryParse1("[") && KEY() && tryParse1("]"))
+  return tryParse1(".") && BARE_WORD() ||
+    tryParse1("[") && KEY() && tryParse1("]")
 }
 function KEY(    idx) {
-  return attempt("KEY") && checkRes("KEY",
-    tryParse("0123456789", idx) &&
+  return tryParse("0123456789", idx) &&
     asm("index") && asm(idx[0]) ||
-    STRING(1))
+    STRING(1)
 }
 function VALUE_GRON() {
-  return attempt("VALUE_GRON") && checkRes("VALUE_GRON",
-    STRING() ||
+  return STRING() ||
     NUMBER() ||
     tryParseExact("true") && asm("true") ||
     tryParseExact("false") && asm("false") ||
     tryParseExact("null") && asm("null") ||
     tryParseExact("{}") && asm("object") ||
-    tryParseExact("[]") && asm("array"))
+    tryParseExact("[]") && asm("array")
 
 }
 # --- ungron ---
@@ -222,10 +205,6 @@ function isComplex(s) { return "object"==s || "array"==s }
 function isSegmentType(s) { return "field" ==s || "index" ==s }
 function isValueHolder(s) { return "string"==s || "number"==s }
 function processRecord(   l, addr, type, value, i) {
-  if (Trace) print "=================="
-  dbgA("Path",Path)
-  dbgA("Types",Types)
-  dbgA("Value",Value)
   l = arrLen(Path)
   addr=""
   for (i=0; i<l; i++) {
@@ -243,11 +222,6 @@ function processRecord(   l, addr, type, value, i) {
   }
 }
 function generateJsonAsm(   i,j,l, a,a_prev,aj, type, addrs) {
-  dbg("AddrType",AddrType)
-  dbg("AddrValue",AddrValue)
-  dbg("AddrCount",AddrCount)
-  dbg("AddrKey",AddrKey)
-
   split("",Stack)
   Ends["object"] = "end_object"
   Ends["array"]  = "end_array"
@@ -284,18 +258,6 @@ function arrPush(arr, e) { arr[arr[-7]++] = e }
 function arrPop(arr,   e) { e = arr[--arr[-7]]; if (arr[-7]<0) die("Can't pop"); delete arr[arr[-7]]; return e }
 function arrLen(arr) { return 0 + arr[-7] }
 function die(msg) { print msg; exit 1 }
-function dbgA(name, arr,    i) {
-  if (!Trace) return
-  print "--- " name " ---"
-  for (i=0; i in arr; i++) print i " : " arr[i]
-}
-function dbg(name, arr,    i, j, k, maxlen, keys) {
-  if (!Trace) return
-  print "--- " name " ---"
-  for (k in arr) { keys[i++] = k; if (maxlen < (j = length(k))) maxlen = j }
-  quicksort(keys,0,i-1)
-  for (j=0; j<i; j++) { k = keys[j]; printf "%-" maxlen "s : %s\n", k, arr[k] }
-}
 # --- generate JSON ---
 function generateJson(   i) {
   for (i=0; i<JsonAsmLen; i++) {
@@ -333,10 +295,6 @@ function tryParse(chars, res, atMost,    i,c,s) {
   return s != ""
 }
 function nextChar() { return substr(In,Pos,1) }
-function checkRes(rule, r) { trace(rule (r?"+":"-")); return r }
-function attempt(rule) { trace(rule "?"); return 1 }
-function trace(x) { if (Trace){ printf "%10s pos %d: %s\n", x, Pos, substr(In,Pos,10) "..."} }
-
 function asm(inst) { Asm[AsmLen++]=inst; return 1 }
 
 # -----
