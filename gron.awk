@@ -25,9 +25,9 @@ function init(   i,line,isUngron) {
           print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
           exit 1
         }
-        # print "Parsed: "
-        #        for (i=0; i<AsmLen; i++)
-        #          print Asm[i]
+         print "Parsed: "
+                for (i=0; i<AsmLen; i++)
+                  print Asm[i]
       } else {
         print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
@@ -287,7 +287,7 @@ function die(msg) { print msg; exit 1 }
 function dbgA(name, arr,    i) {
   if (!Trace) return
   print "--- " name " ---"
-  for (i=0; i<arrLen(arr); i++) print i " : " arr[i]
+  for (i=0; i in arr; i++) print i " : " arr[i]
 }
 function dbg(name, arr,    i, j, k, maxlen, keys) {
   if (!Trace) return
