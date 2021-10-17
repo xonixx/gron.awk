@@ -1,0 +1,233 @@
+
+@define TUSH_REPO=https://github.com/adolfopa/tush
+@define GOAWK_VERSION=1.8.1
+@define GOAWK=goawk$GOAWK_VERSION
+@define AWK="awk"
+
+@options timing
+
+@goal soft_folder_created @private
+@reached_if [[ -d "soft" ]]
+  mkdir soft
+
+@goal tush_installed @private
+@depends_on soft_folder_created
+@reached_if [[ -f "soft/tush/bin/tush-check" ]]
+  echo
+  echo "Fetching tush..."
+  echo
+
+  cd "soft"
+
+  if which wget >/dev/null 2>/dev/null
+  then
+    wget $TUSH_REPO/archive/master.tar.gz -O./tush.tar.gz
+    tar xzvf ./tush.tar.gz
+    rm ./tush.tar.gz
+    mv tush-master tush
+  else
+    git clone --depth 1 $TUSH_REPO.git
+    rm -r tush/.git
+  fi
+
+@goal soft_installed @private
+@depends_on tush_installed
+
+@goal cleaned_soft @private
+@reached_if [[ ! -d "soft" ]]
+  rm -r "soft"
+
+@goal cleaned @private
+@depends_on cleaned_soft
+
+@goal debug @private
+  case "$AWK" in
+    *mawk*) "$AWK" -W version 2>&1 | head -n 1
+            ;;
+         *) "$AWK" --version | head -n 1
+            ;;
+  esac
+  bash --version| head -n 1
+
+@goal prepared4tests @private
+@depends_on tush_installed debug
+
+@goal @glob tests.*.tush @private
+@depends_on prepared4tests
+  f="$ITEM"
+
+  export PATH="$PATH:$MYDIR/soft/tush/bin"
+
+  if DIFF="diff --strip-trailing-cr" tush-check "$f"
+  then
+    echo "TESTS PASSED : $f"
+  else
+    echo >&2 "!!! TESTS FAILED !!! : $f"
+    exit 1
+  fi
+
+@goal tested
+@doc run tests
+@depends_on tests.*.tush
+
+@goal default
+@doc same as tested
+@depends_on tested
+
+@goal notrace @glob *.awk
+  awk '$1 !~ /^trace\(/' "$ITEM"
+
+#-------------------------------
+@goal tested_awks
+@doc tests with all awks
+@depends_on tested
+@depends_on tested_bwk
+@depends_on tested_mawk
+@depends_on tested_mawk134
+@depends_on tested_gawk51
+#@depends_on tested_goawk
+
+@goal tested_bwk @private
+@depends_on installed_bwk
+  ./makesure -D AWK="$(pwd)/soft/bwk" tested
+
+@goal tested_mawk134 @private
+@depends_on installed_mawk134
+  ./makesure -D AWK="$(pwd)/soft/mawk134" tested
+
+@goal tested_gawk51 @private
+@depends_on installed_gawk51
+  ./makesure -D AWK="$(pwd)/soft/gawk51" tested
+
+@goal tested_goawk @private
+@depends_on installed_goawk
+  ./makesure -D AWK="$(pwd)/soft/$GOAWK" tested
+
+@goal tested_mawk @private
+  if [[ -x /usr/bin/mawk ]]
+  then
+    ./makesure -D AWK="/usr/bin/mawk" tested
+  else
+    echo "No default mawk... Skipped testing it."
+  fi
+#-------------------------------
+
+@goal installed_awks
+@doc installs all awks into ./soft
+@depends_on installed_bwk
+@depends_on installed_gawk51
+@depends_on installed_mawk134
+@depends_on installed_goawk
+
+@goal installed_bwk @private
+@reached_if [[ -f soft/bwk ]]
+@depends_on soft_folder_created
+  echo
+  echo "Fetching BWK..."
+  echo
+
+  cd "soft"
+
+  wget https://github.com/onetrueawk/awk/archive/refs/heads/master.tar.gz -Obwk.tar.gz
+  tar xzvf bwk.tar.gz
+  rm bwk.tar.gz
+
+  echo
+  echo "Compile BWK..."
+  echo
+
+  cd "awk-master"
+
+  make
+
+  mv a.out ../bwk
+
+  cd ..
+  ./bwk --version
+  rm -r awk-master
+
+@goal installed_gawk51 @private
+@reached_if [[ -f soft/gawk51 ]]
+@depends_on soft_folder_created
+  echo
+  echo "Fetching Gawk-5.1.0..."
+  echo
+
+  cd "soft"
+
+  G=gawk-5.1.0.tar.gz
+  wget "http://git.savannah.gnu.org/cgit/gawk.git/snapshot/$G"
+  tar xzvf "$G"
+  rm "$G"
+
+  echo
+  echo "Compile Gawk-5.1.0..."
+  echo
+
+  cd "gawk-5.1.0"
+
+  ./configure
+  make
+  # make check
+
+  mv gawk ../gawk51
+  mkdir ../gawk51_libs
+  mv extension/.libs/*.so ../gawk51_libs # for AWKLIBPATH
+
+  cd ..
+  ./gawk51 --version
+  rm -r "gawk-5.1.0"
+
+@goal installed_mawk134 @private
+@reached_if [[ -f soft/mawk134 ]]
+@depends_on soft_folder_created
+  echo
+  echo "Fetching Mawk 1.3.4..."
+  echo
+
+  cd "soft"
+
+  F=mawk.tar.gz
+  wget "https://invisible-island.net/datafiles/release/$F"
+  tar xzvf "$F"
+  rm "$F"
+
+  echo
+  echo "Compile Mawk 1.3.4..."
+  echo
+
+  cd mawk-1.3.4-*
+
+  ./configure && make
+
+  mv mawk ../mawk134
+
+  cd ..
+  ./mawk134 -W version
+  rm -r mawk-1.3.4-*
+
+@goal installed_goawk @private
+@reached_if [[ -f soft/$GOAWK ]]
+@depends_on soft_folder_created
+  echo
+  echo "Fetching GoAWK $GOAWK_VERSION ..."
+  echo
+
+  cd "soft"
+
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    os="linux"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    os="darwin"
+  else
+    >&2 echo "Unknown OS"
+    exit 1
+  fi
+
+  F=goawk_v${GOAWK_VERSION}_${os}_amd64.tar.gz
+  wget "https://github.com/benhoyt/goawk/releases/download/v$GOAWK_VERSION/$F"
+  tar xzvf "$F" goawk
+  rm "$F"
+
+  mv goawk $GOAWK
+  "./$GOAWK" --version
