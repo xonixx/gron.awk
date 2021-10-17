@@ -6,7 +6,7 @@ $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json.a[1]=2
 | json.a[2]=3
 
-$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk -u
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk -- -u
 | {
 |   "a": [
 |     1,
@@ -104,7 +104,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
 | json["web-app"].taglib["taglib-uri"]="cofax.tld"
 | json["web-app"].taglib["taglib-location"]="/WEB-INF/tlds/cofax.tld"
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk -u
+$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk -- -u
 | {
 |   "web-app": {
 |     "servlet": [
