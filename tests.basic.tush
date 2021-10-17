@@ -104,4 +104,31 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
 | json["web-app"].taglib["taglib-uri"]="cofax.tld"
 | json["web-app"].taglib["taglib-location"]="/WEB-INF/tlds/cofax.tld"
 
-# $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | $AWK -f gron.awk -u
+$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk -u
+| {
+|   "web-app": {
+|     "servlet": [
+|       {
+|         "init-param": {
+|           "dataStoreClass": "org.cofax.SqlDataStore",
+|           "redirectionClass": "org.cofax.SqlRedirection",
+|           "templateLoaderClass": "org.cofax.FilesTemplateLoader",
+|           "templateProcessorClass": "org.cofax.WysiwygTemplate"
+|         },
+|         "servlet-class": "org.cofax.cds.CDSServlet"
+|       },
+|       {
+|         "servlet-class": "org.cofax.cds.EmailServlet"
+|       },
+|       {
+|         "servlet-class": "org.cofax.cds.AdminServlet"
+|       },
+|       {
+|         "servlet-class": "org.cofax.cds.FileServlet"
+|       },
+|       {
+|         "servlet-class": "org.cofax.cms.CofaxToolsServlet"
+|       }
+|     ]
+|   }
+| }
