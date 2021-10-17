@@ -1,0 +1,16 @@
+
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
+| json={}
+| json.a=[]
+| json.a[0]=1
+| json.a[1]=2
+| json.a[2]=3
+
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk -u
+| {
+|   "a": [
+|     1,
+|     2,
+|     3
+|   ]
+| }
