@@ -1,17 +1,17 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,line,isUngron) {
+function init(   i,line) {
   Trace="Trace" in ENVIRON
 
   for (i = 1; i < ARGC; i++) {
-    if (isUngron = ARGV[i]=="-u") {
+    if (IsUngron = ARGV[i]=="-u") {
       delete ARGV[i]
       break
     }
   }
 
-  if (isUngron) {
+  if (IsUngron) {
     split("", Asm); AsmLen=0 # Gron asm
     split("", JsonAsm); JsonAsmLen=0
 
@@ -25,9 +25,6 @@ function init(   i,line,isUngron) {
           print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
           exit 1
         }
-         print "Parsed: "
-                for (i=0; i<AsmLen; i++)
-                  print Asm[i]
       } else {
         print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
@@ -35,6 +32,9 @@ function init(   i,line,isUngron) {
     }
 
     # ungron (gron asm -> json asm)
+#    print "Parsed: "
+#    for (i=0; i<AsmLen; i++)
+#      print Asm[i]
 
     split("", AddrType)  # addr -> type
     split("", AddrValue) # addr -> value
@@ -129,7 +129,7 @@ function tryParseSafeChar(res,   c) {
 }
 function STRING(isKey,    res) {
   return attempt("STRING" isKey) && checkRes("STRING" isKey,
-    tryParse1("\"",res) && asm(isKey ? "key" : "string") &&
+    tryParse1("\"",res) && asm(isKey ? (IsUngron ? "field" : "key") : "string") &&
     tryParseCharacters(res) &&
     tryParse1("\"",res) &&
     asm(res[0]))
