@@ -29,7 +29,7 @@ function init(   i,line) {
       }
     }
 
-    # ungron (gron asm -> json asm)
+    # --- ungron (gron asm -> json asm) ---
     #    print "Parsed: "
     #    for (i=0; i<AsmLen; i++)
     #      print Asm[i]
@@ -61,7 +61,7 @@ function init(   i,line) {
     #    for (i=0; i<JsonAsmLen; i++)
     #      print JsonAsm[i]
 
-    # generate JSON
+    # --- generate JSON ---
     #    Indent = ENVIRON["Indent"] + 0
     Indent = 2
     for (i=0; i<Indent; i++)
@@ -73,7 +73,7 @@ function init(   i,line) {
     WasPrev = 0
     generateJson()
   } else {
-    # ----- parse JSON -----
+    # --- parse JSON ---
     while (getline line > 0)
       In = In line "\n"
 
@@ -89,7 +89,7 @@ function init(   i,line) {
       #    for (i=0; i<AsmLen; i++)
       #      print Asm[i]
 
-      # ----- generate GRON -----
+      # --- generate GRON ---
       split("",Stack); split("",PathStack)
       Depth = 0
       generateGron()
@@ -221,10 +221,10 @@ function processRecord(   l, addr, type, value, i) {
     AddrKey[addr] = Path[i]
   }
 }
-function generateJsonAsm(   i,j,l, a,a_prev,aj, type, addrs) {
+function generateJsonAsm(   i,j,l, a,a_prev,aj,type,addrs,ends) {
   split("",Stack)
-  Ends["object"] = "end_object"
-  Ends["array"]  = "end_array"
+  ends["object"] = "end_object"
+  ends["array"]  = "end_array"
 
   for (a in AddrType) arrPush(addrs, a)
   quicksort(addrs, 0, (l=arrLen(addrs))-1)
@@ -234,7 +234,7 @@ function generateJsonAsm(   i,j,l, a,a_prev,aj, type, addrs) {
     if (i>0) {
       a_prev = addrs[i-1]
       for (j=0; j<AddrCount[a_prev] - AddrCount[a] + (isComplex(AddrType[a_prev])?1:0); j++)
-        asmJson(Ends[arrPop(Stack)])
+        asmJson(ends[arrPop(Stack)])
         # determine the type of current container (object/array) - for array should not issue "key"
       for (j=i; AddrCount[a]-AddrCount[aj=addrs[j]] != 1; j--) {} # descend to addr of prev segment
       if ("array" != AddrType[aj]) {
@@ -249,7 +249,7 @@ function generateJsonAsm(   i,j,l, a,a_prev,aj, type, addrs) {
       asmJson(AddrValue[a])
     if (i==l-1) { # last
       for (j=0; j<AddrCount[a] - (isComplex(type)?0:1); j++)
-        asmJson(Ends[arrPop(Stack)])
+        asmJson(ends[arrPop(Stack)])
     }
   }
 }
@@ -321,7 +321,6 @@ function pG(v,    row,i,by_idx,segment,segment_unq) {
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
     segment_unq = stringUnquote(segment)
-    #        by_idx = "array"==Stack[i] || segment_unq !~ /^[[:alpha:]$_][[:alnum:]$_]*$/   # fails for mawk<=1.3.3
     by_idx = "array"==Stack[i] || segment_unq !~ /^[a-zA-Z$_][a-zA-Z0-9$_]*$/
     row= row (i==0||by_idx?"":".") (by_idx ? "[" segment "]" : segment_unq)
   }
@@ -346,7 +345,6 @@ function stringUnquote(text,    len)
 }
 
 function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
-  #  print s1, s2, i1, i2
   if (_digit(c1 = substr(s1,i1,1)) && _digit(c2 = substr(s2,i2,1))) {
     n1 = +c1; while(_digit(c1 = substr(s1,++i1,1))) { n1 = n1 * 10 + c1 }
     n2 = +c2; while(_digit(c2 = substr(s2,++i2,1))) { n2 = n2 * 10 + c2 }
