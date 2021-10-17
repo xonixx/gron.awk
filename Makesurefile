@@ -231,3 +231,11 @@
 
   mv goawk $GOAWK
   "./$GOAWK" --version
+
+@goal timeit
+@depends_on installed_awks
+  for AWK in gawk51 mawk134 bwk
+  do
+    echo "Testing $AWK ..."
+    time cat big.json | ./soft/$AWK -f gron.awk | ./soft/$AWK -f gron.awk -- -u > /dev/null
+  done
