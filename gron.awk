@@ -20,11 +20,11 @@ function init(   i,line,isStructure) {
       if (STATEMENT()) {
         asm("end")
         if (Pos <= length(In)) {
-          print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
+          print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
           exit 1
         }
       } else {
-        print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
+        print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
       }
     }
@@ -82,7 +82,7 @@ function init(   i,line,isStructure) {
 
     if (ELEMENT()) {
       if (Pos <= length(In)) {
-        print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
+        print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
       }
       # print "Parsed: "
@@ -94,7 +94,7 @@ function init(   i,line,isStructure) {
       split("",Stack); split("",PathStack)
       Depth = 0
       generateGron(isStructure)
-    } else print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
+    } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
   }
 }
 
