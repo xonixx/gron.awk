@@ -1,10 +1,12 @@
 # gron.awk
 
-Similar to https://github.com/tomnomnom/gron but in Awk.
+Similar to [tomnomnom/gron](https://github.com/tomnomnom/gron) but in Awk.
 
 Features true JSON parser in Awk.
  
 Reasonably fast with Gawk/Mawk even on large-ish files. Slow with [BWK](https://github.com/onetrueawk/awk) on big JSON files (100K+).
+
+Incubated from [xonixx/awk_lab](https://github.com/xonixx/awk_lab).
 
 ## Usage
 
