@@ -1,9 +1,9 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,line) {
+function init(   i,line,isStructure) {
   for (i = 1; i < ARGC; i++) {
-    if (IsUngron = ARGV[i]=="-u") {
+    if ((IsUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
       break
     }
@@ -90,9 +90,10 @@ function init(   i,line) {
       #      print Asm[i]
 
       # --- generate GRON ---
+      split("",AlreadyTracked)
       split("",Stack); split("",PathStack)
       Depth = 0
-      generateGron()
+      generateGron(isStructure)
     } else print "Can't advance at pos " Pos ": " substr(In,Pos,10) "..."
   }
 }
@@ -298,15 +299,15 @@ function nextChar() { return substr(In,Pos,1) }
 function asm(inst) { Asm[AsmLen++]=inst; return 1 }
 
 # -----
-function generateGron(   i, instr) {
+function generateGron(isStructure,   i, instr) {
   for (i=0; i<AsmLen; i++) {
-    if (isComplex(instr = Asm[i]))               { pG("object"==instr?"{}":"[]")
+    if (isComplex(instr = Asm[i]))               { printRow(isStructure,"object"==instr?"{}":"[]")
     Stack[++Depth]=instr
     if (inArr()) { PathStack[Depth]=0 } }
-    else if (isSingle(instr))                    { pG(instr);               incArrIdx() }
+    else if (isSingle(instr))                    { printRow(isStructure,instr);               incArrIdx() }
     else if (isEnd(instr))                       { Depth--;                incArrIdx() }
     else if ("key" == instr)                     { PathStack[Depth]=Asm[++i];          }
-    else if ("number"==instr || "string"==instr) { pG(Asm[++i]);            incArrIdx() }
+    else if ("number"==instr || "string"==instr) { printRow(isStructure,Asm[++i]);            incArrIdx() }
     else { print "Error at instruction#" i ": " instr; exit 1 }
   }
 }
@@ -316,7 +317,24 @@ function inArr() { return "array"==Stack[Depth] }
 function isEnd(s) { return "end_object"==s || "end_array"==s }
 function incArrIdx() { if (inArr()) PathStack[Depth]++ }
 
-function pG(v,    row,i,by_idx,segment,segment_unq) {
+function printRow(isStructure, v) {
+  isStructure ? printStructure(v) : printGron(v)
+}
+function printStructure(v,    row,i,is_arr,by_idx,segment,segment_unq) {
+  row=""
+  for(i=1; i<=Depth; i++) {
+    segment = PathStack[i]
+    segment_unq = stringUnquote(segment)
+    by_idx = (is_arr="array"==Stack[i]) || segment_unq !~ /^[a-zA-Z$_][a-zA-Z0-9$_]*$/
+    row = row (i==0||is_arr?"":".") (is_arr ? "[]" : by_idx ? segment : segment_unq)
+  }
+  if (row in AlreadyTracked) return
+  AlreadyTracked[row]
+  if ("{}" == v || "[]" == v) return
+  row = row " = " v
+  print row
+}
+function printGron(v,    row,i,by_idx,segment,segment_unq) {
   row="json"
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
