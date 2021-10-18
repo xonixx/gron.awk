@@ -1,15 +1,15 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,line,isStructure) {
+function init(   i,line,isStructure,isUngron) {
   for (i = 1; i < ARGC; i++) {
-    if ((IsUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
+    if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
       break
     }
   }
 
-  if (IsUngron) {
+  if (isUngron) {
     split("", Asm); AsmLen=0 # Gron asm
     split("", JsonAsm); JsonAsmLen=0
 
@@ -126,7 +126,7 @@ function tryParseSafeChar(res,   c) {
   return 0
 }
 function STRING(isKey,    res) {
-  return tryParse1("\"",res) && asm(isKey ? (IsUngron ? "field" : "key") : "string") &&
+  return tryParse1("\"",res) && asm(isKey ? "key" : "string") &&
     tryParseCharacters(res) &&
     tryParse1("\"",res) &&
     asm(res[0])
@@ -177,7 +177,7 @@ function PATH() {
 function BARE_WORD(    word) {
   return tryParse1("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_", word) &&
     (tryParse( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789", word) || 1) &&
-    asm("field") && asm("\"" word[0] "\"")
+    asm("key") && asm("\"" word[0] "\"")
 }
 function SEGMENTS() {
   return SEGMENT() && SEGMENTS() || 1
@@ -203,7 +203,7 @@ function VALUE_GRON() {
 }
 # --- ungron ---
 function isComplex(s) { return "object"==s || "array"==s }
-function isSegmentType(s) { return "field" ==s || "index" ==s }
+function isSegmentType(s) { return "key" ==s || "index" ==s }
 function isValueHolder(s) { return "string"==s || "number"==s }
 function processRecord(   l, addr, type, value, i) {
   l = arrLen(Path)
@@ -211,7 +211,7 @@ function processRecord(   l, addr, type, value, i) {
   for (i=0; i<l; i++) {
     # build addr
     addr = addr (i>0?",":"") Path[i]
-    type = i<l-1 ? (Types[i+1] == "field" ? "object" : "array") : Value[0]
+    type = i<l-1 ? (Types[i+1] == "key" ? "object" : "array") : Value[0]
     value = i<l-1 ? "" : Value[1]
     if (addr in AddrType && type != AddrType[addr]) {
       die("Conflicting types for " addr ": " type " and " AddrType[addr])
