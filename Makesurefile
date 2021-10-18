@@ -237,5 +237,6 @@
   for AWK in gawk51 mawk134 bwk
   do
     echo "Testing $AWK ..."
-    time cat big.json | ./soft/$AWK -f gron.awk | ./soft/$AWK -f gron.awk -- -u > /dev/null
+#    time cat big.json | ./soft/$AWK -f gron.awk | ./soft/$AWK -f gron.awk -- -u > /dev/null
+    time cat big.json | ./soft/$AWK -f gron.awk > /dev/null
   done
