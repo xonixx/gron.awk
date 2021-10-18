@@ -104,6 +104,73 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
 | json["web-app"].taglib["taglib-uri"]="cofax.tld"
 | json["web-app"].taglib["taglib-location"]="/WEB-INF/tlds/cofax.tld"
 
+$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk -- -s
+| ."web-app".servlet[]."servlet-name" = "cofaxCDS"
+| ."web-app".servlet[]."servlet-class" = "org.cofax.cds.CDSServlet"
+| ."web-app".servlet[]."init-param"."configGlossary:installationAt" = "Philadelphia, PA"
+| ."web-app".servlet[]."init-param"."configGlossary:adminEmail" = "ksm@pobox.com"
+| ."web-app".servlet[]."init-param"."configGlossary:poweredBy" = "Cofax"
+| ."web-app".servlet[]."init-param"."configGlossary:poweredByIcon" = "/images/cofax.gif"
+| ."web-app".servlet[]."init-param"."configGlossary:staticPath" = "/content/static"
+| ."web-app".servlet[]."init-param".templateProcessorClass = "org.cofax.WysiwygTemplate"
+| ."web-app".servlet[]."init-param".templateLoaderClass = "org.cofax.FilesTemplateLoader"
+| ."web-app".servlet[]."init-param".templatePath = "templates"
+| ."web-app".servlet[]."init-param".templateOverridePath = ""
+| ."web-app".servlet[]."init-param".defaultListTemplate = "listTemplate.htm"
+| ."web-app".servlet[]."init-param".defaultFileTemplate = "articleTemplate.htm"
+| ."web-app".servlet[]."init-param".useJSP = false
+| ."web-app".servlet[]."init-param".jspListTemplate = "listTemplate.jsp"
+| ."web-app".servlet[]."init-param".jspFileTemplate = "articleTemplate.jsp"
+| ."web-app".servlet[]."init-param".cachePackageTagsTrack = 200
+| ."web-app".servlet[]."init-param".cachePackageTagsStore = 200
+| ."web-app".servlet[]."init-param".cachePackageTagsRefresh = 60
+| ."web-app".servlet[]."init-param".cacheTemplatesTrack = 100
+| ."web-app".servlet[]."init-param".cacheTemplatesStore = 50
+| ."web-app".servlet[]."init-param".cacheTemplatesRefresh = 15
+| ."web-app".servlet[]."init-param".cachePagesTrack = 200
+| ."web-app".servlet[]."init-param".cachePagesStore = 100
+| ."web-app".servlet[]."init-param".cachePagesRefresh = 10
+| ."web-app".servlet[]."init-param".cachePagesDirtyRead = 10
+| ."web-app".servlet[]."init-param".searchEngineListTemplate = "forSearchEnginesList.htm"
+| ."web-app".servlet[]."init-param".searchEngineFileTemplate = "forSearchEngines.htm"
+| ."web-app".servlet[]."init-param".searchEngineRobotsDb = "WEB-INF/robots.db"
+| ."web-app".servlet[]."init-param".useDataStore = true
+| ."web-app".servlet[]."init-param".dataStoreClass = "org.cofax.SqlDataStore"
+| ."web-app".servlet[]."init-param".redirectionClass = "org.cofax.SqlRedirection"
+| ."web-app".servlet[]."init-param".dataStoreName = "cofax"
+| ."web-app".servlet[]."init-param".dataStoreDriver = "com.microsoft.jdbc.sqlserver.SQLServerDriver"
+| ."web-app".servlet[]."init-param".dataStoreUrl = "jdbc:microsoft:sqlserver://LOCALHOST:1433;DatabaseName=goon"
+| ."web-app".servlet[]."init-param".dataStoreUser = "sa"
+| ."web-app".servlet[]."init-param".dataStorePassword = "dataStoreTestQuery"
+| ."web-app".servlet[]."init-param".dataStoreTestQuery = "SET NOCOUNT ON;select test='test';"
+| ."web-app".servlet[]."init-param".dataStoreLogFile = "/usr/local/tomcat/logs/datastore.log"
+| ."web-app".servlet[]."init-param".dataStoreInitConns = 10
+| ."web-app".servlet[]."init-param".dataStoreMaxConns = 100
+| ."web-app".servlet[]."init-param".dataStoreConnUsageLimit = 100
+| ."web-app".servlet[]."init-param".dataStoreLogLevel = "debug"
+| ."web-app".servlet[]."init-param".maxUrlLength = 500
+| ."web-app".servlet[]."init-param".mailHost = "mail1"
+| ."web-app".servlet[]."init-param".mailHostOverride = "mail2"
+| ."web-app".servlet[]."init-param".log = 1
+| ."web-app".servlet[]."init-param".logLocation = "/usr/local/tomcat/logs/CofaxTools.log"
+| ."web-app".servlet[]."init-param".logMaxSize = ""
+| ."web-app".servlet[]."init-param".dataLog = 1
+| ."web-app".servlet[]."init-param".dataLogLocation = "/usr/local/tomcat/logs/dataLog.log"
+| ."web-app".servlet[]."init-param".dataLogMaxSize = ""
+| ."web-app".servlet[]."init-param".removePageCache = "/content/admin/remove?cache=pages&id="
+| ."web-app".servlet[]."init-param".removeTemplateCache = "/content/admin/remove?cache=templates&id="
+| ."web-app".servlet[]."init-param".fileTransferFolder = "/usr/local/tomcat/webapps/content/fileTransferFolder"
+| ."web-app".servlet[]."init-param".lookInContext = 1
+| ."web-app".servlet[]."init-param".adminGroupID = 4
+| ."web-app".servlet[]."init-param".betaServer = true
+| ."web-app"."servlet-mapping".cofaxCDS = "/"
+| ."web-app"."servlet-mapping".cofaxEmail = "/cofaxutil/aemail/*"
+| ."web-app"."servlet-mapping".cofaxAdmin = "/admin/*"
+| ."web-app"."servlet-mapping".fileServlet = "/static/*"
+| ."web-app"."servlet-mapping".cofaxTools = "/tools/*"
+| ."web-app".taglib."taglib-uri" = "cofax.tld"
+| ."web-app".taglib."taglib-location" = "/WEB-INF/tlds/cofax.tld"
+
 $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk -- -u
 | {
 |   "web-app": {
