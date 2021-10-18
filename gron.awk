@@ -30,9 +30,7 @@ function init(   i,line,isStructure,isUngron) {
     }
 
     # --- ungron (gron asm -> json asm) ---
-    #    print "Parsed: "
-    #    for (i=0; i<AsmLen; i++)
-    #      print Asm[i]
+    #    dbgA("--- Gron asm:",Asm)
 
     split("", AddrType)  # addr -> type
     split("", AddrValue) # addr -> value
@@ -57,9 +55,7 @@ function init(   i,line,isStructure,isUngron) {
       } else if ("end" == Instr) { processRecord() }
     }
     generateJsonAsm()
-    #    print "--- JSON asm ---"
-    #    for (i=0; i<JsonAsmLen; i++)
-    #      print JsonAsm[i]
+    #    dbgA("--- JSON asm:",JsonAsm)
 
     # --- generate JSON ---
     #    Indent = ENVIRON["Indent"] + 0
@@ -85,9 +81,7 @@ function init(   i,line,isStructure,isUngron) {
         print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
       }
-      # print "Parsed: "
-      #    for (i=0; i<AsmLen; i++)
-      #      print Asm[i]
+      #      dbgA("--- JSON asm:",Asm)
 
       # --- generate GRON ---
       split("",AlreadyTracked)
@@ -97,6 +91,8 @@ function init(   i,line,isStructure,isUngron) {
     } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
   }
 }
+
+#function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) print arr[i] }
 
 # --- JSON ---
 function tryParseDigitOptional(res) { tryParse("0123456789", res); return 1 }
