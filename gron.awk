@@ -176,7 +176,7 @@ function PATH() {
 }
 function BARE_WORD(    word) {
   return tryParse1("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_", word) &&
-    (tryParse( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789", word) || 1) &&
+    (tryParse("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_0123456789", word) || 1) &&
     asm("key") && asm("\"" word[0] "\"")
 }
 function SEGMENTS() {
@@ -256,8 +256,8 @@ function generateJsonAsm(   i,j,l, a,a_prev,aj,type,addrs,ends) {
 }
 function asmJson(inst) { JsonAsm[JsonAsmLen++]=inst; return 1 }
 function arrPush(arr, e) { arr[arr[-7]++] = e }
-function arrPop(arr,   e) { e = arr[--arr[-7]]; if (arr[-7]<0) die("Can't pop"); delete arr[arr[-7]]; return e }
-function arrLen(arr) { return 0 + arr[-7] }
+function arrPop(arr,   e,l) { e = arr[l=--arr[-7]]; if (l<0) die("Can't pop"); delete arr[l]; return e }
+function arrLen(arr) { return +arr[-7] }
 function die(msg) { print msg; exit 1 }
 # --- generate JSON ---
 function generateJson(   i) {
