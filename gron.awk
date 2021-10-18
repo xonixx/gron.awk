@@ -320,13 +320,12 @@ function incArrIdx() { if (inArr()) PathStack[Depth]++ }
 function printRow(isStructure, v) {
   isStructure ? printStructure(v) : printGron(v)
 }
-function printStructure(v,    row,i,is_arr,by_idx,segment,segment_unq) {
+function printStructure(v,    row,i,isArr,by_idx,segment) {
   row=""
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
-    segment_unq = stringUnquote(segment)
-    by_idx = (is_arr="array"==Stack[i]) || segment_unq !~ /^[a-zA-Z$_][a-zA-Z0-9$_]*$/
-    row = row (i==0||is_arr?"":".") (is_arr ? "[]" : by_idx ? segment : segment_unq)
+    by_idx = (isArr="array"==Stack[i]) || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
+    row = row (i==0||isArr?"":".") (isArr ? "[]" : by_idx ? segment : _unqote(segment))
   }
   if (row in AlreadyTracked) return
   AlreadyTracked[row]
@@ -334,32 +333,19 @@ function printStructure(v,    row,i,is_arr,by_idx,segment,segment_unq) {
   row = row " = " v
   print row
 }
-function printGron(v,    row,i,by_idx,segment,segment_unq) {
+function printGron(v,    row,i,byIdx,segment) {
   row="json"
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
-    segment_unq = stringUnquote(segment)
-    by_idx = "array"==Stack[i] || segment_unq !~ /^[a-zA-Z$_][a-zA-Z0-9$_]*$/
-    row= row (i==0||by_idx?"":".") (by_idx ? "[" segment "]" : segment_unq)
+    byIdx = "array"==Stack[i] || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
+    row= row (i==0||byIdx?"":".") (byIdx ? "[" segment "]" : _unqote(segment))
   }
   row=row "=" v # ";"
   print row
 }
 
-function stringUnquote(text,    len)
-{
-  len  = length(text)
-  text = len == 2 ? "" : substr(text, 2, len-2)
-
-  gsub(/\\\\/, "\\", text)
-  gsub(/\\"/,  "\"", text)
-  gsub(/\\b/,  "\b", text)
-  gsub(/\\f/,  "\f", text)
-  gsub(/\\n/,  "\n", text)
-  gsub(/\\r/,  "\r", text)
-  gsub(/\\t/,  "\t", text)
-
-  return text
+function _unqote(text,    len) {
+  return (len=length(text)) == 2 ? "" : substr(text, 2, len-2)
 }
 
 function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
