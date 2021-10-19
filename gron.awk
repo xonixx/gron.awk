@@ -10,6 +10,28 @@ function init(   i,isStructure,isUngron) {
   }
   isUngron ? ungron() : gron(isStructure)
 }
+function gron(isStructure,   line) {
+  # --- parse JSON ---
+  while (getline line > 0)
+    In = In line "\n"
+
+  Pos=1
+  split("", Asm); AsmLen=0
+
+  if (ELEMENT()) {
+    if (Pos <= length(In)) {
+      print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
+      exit 1
+    }
+    #      dbgA("--- JSON asm:",Asm)
+
+    # --- generate GRON ---
+    split("",AlreadyTracked)
+    split("",Stack); split("",PathStack)
+    Depth = 0
+    generateGron(isStructure)
+  } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
+}
 function ungron(   i,instr) {
   split("", Asm); AsmLen=0 # Gron asm
   split("", JsonAsm); JsonAsmLen=0
@@ -68,28 +90,6 @@ function ungron(   i,instr) {
   split("",Stack)
   Depth = 0
   generateJson()
-}
-function gron(isStructure,   line) {
-  # --- parse JSON ---
-  while (getline line > 0)
-    In = In line "\n"
-
-  Pos=1
-  split("", Asm); AsmLen=0
-
-  if (ELEMENT()) {
-    if (Pos <= length(In)) {
-      print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
-      exit 1
-    }
-    #      dbgA("--- JSON asm:",Asm)
-
-    # --- generate GRON ---
-    split("",AlreadyTracked)
-    split("",Stack); split("",PathStack)
-    Depth = 0
-    generateGron(isStructure)
-  } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
 }
 #function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) printf "%2s : %s\n", i,arr[i] }
 
