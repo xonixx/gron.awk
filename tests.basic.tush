@@ -210,3 +210,11 @@ $ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk -- -u
 |     "b": 2
 |   }
 | }
+
+$ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk -- -u
+| {
+|   "a": {
+|     "b": 1,
+|     "c": "CCC"
+|   }
+| }

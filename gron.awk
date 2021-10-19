@@ -127,9 +127,8 @@ function STRING(isKey,    res) {
     tryParse1("\"",res) &&
     asm(res[0])
 }
-function WS() {
-  return tryParse("\t\n\r ") || 1
-}
+function WS() { return tryParse("\t\n\r ") || 1 }
+function WS1() { return tryParse("\t ") || 1 }
 function VALUE() {
   return OBJECT() ||
     ARRAY()  ||
@@ -165,7 +164,7 @@ function ELEMENT() {
 }
 # --- GRON ---
 function STATEMENT() {
-  return PATH() && tryParse1("=") && asm("value") && VALUE_GRON()
+  return PATH() && WS1() && tryParse1("=") && WS1() && asm("value") && VALUE_GRON() && (tryParse1(";")||1)
 }
 function PATH() {
   return BARE_WORD() && SEGMENTS()
@@ -341,12 +340,12 @@ function printGron(v,    row,i,byIdx,segment) {
     byIdx = "array"==Stack[i] || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
     row= row (i==0||byIdx?"":".") (byIdx ? "[" segment "]" : _unqote(segment))
   }
-  row=row "=" v # ";"
+  row=row "=" v
   print row
 }
 
-function _unqote(text,    len) {
-  return (len=length(text)) == 2 ? "" : substr(text, 2, len-2)
+function _unqote(text,    l) {
+  return (l=length(text)) == 2 ? "" : substr(text, 2, l-2)
 }
 
 function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
