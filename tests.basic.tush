@@ -6,6 +6,25 @@ $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json.a[1]=2
 | json.a[2]=3
 
+$ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk -- -u
+| {
+|   "a": {
+|     "b": 1,
+|     "c": "CCC"
+|   }
+| }
+
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk -- -u
+| {
+|   "a": {
+|     "b": 2
+|   }
+| }
+
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk -- -u
+| Conflicting types for "x","a","b": string and number
+? 1
+
 $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk > /tmp/1.txt; cat /tmp/1.txt | $AWK -f gron.awk -- -u
 | {
 |   "a": [
@@ -197,24 +216,5 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f g
 |         "servlet-class": "org.cofax.cms.CofaxToolsServlet"
 |       }
 |     ]
-|   }
-| }
-
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk -- -u
-| Conflicting types for "x","a","b": string and number
-? 1
-
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk -- -u
-| {
-|   "a": {
-|     "b": 2
-|   }
-| }
-
-$ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk -- -u
-| {
-|   "a": {
-|     "b": 1,
-|     "c": "CCC"
 |   }
 | }
