@@ -199,3 +199,14 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f g
 |     ]
 |   }
 | }
+
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk -- -u
+| Conflicting types for "x","a","b": string and number
+? 1
+
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk -- -u
+| {
+|   "a": {
+|     "b": 2
+|   }
+| }

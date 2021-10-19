@@ -207,8 +207,13 @@ function processRecord(   l, addr, type, value, i) {
   for (i=0; i<l; i++) {
     # build addr
     addr = addr (i>0?",":"") Path[i]
-    type = i<l-1 ? (Types[i+1] == "key" ? "object" : "array") : Value[0]
-    value = i<l-1 ? "" : Value[1]
+    if (i<l-1) {
+      type = Types[i+1] == "key" ? "object" : "array"
+      value = ""
+    } else {
+      type = Value[0]
+      value = Value[1]
+    }
     if (addr in AddrType && type != AddrType[addr]) {
       die("Conflicting types for " addr ": " type " and " AddrType[addr])
     }
@@ -218,7 +223,7 @@ function processRecord(   l, addr, type, value, i) {
     AddrKey[addr] = Path[i]
   }
 }
-function generateJsonAsm(   i,j,l, a,a_prev,aj,type,addrs,ends) {
+function generateJsonAsm(   i,j,l, a,aPrev,aj,type,addrs,ends) {
   split("",Stack)
   ends["object"] = "end_object"
   ends["array"]  = "end_array"
@@ -229,8 +234,8 @@ function generateJsonAsm(   i,j,l, a,a_prev,aj,type,addrs,ends) {
     a = addrs[i]
     type = AddrType[a]
     if (i>0) {
-      a_prev = addrs[i-1]
-      for (j=0; j<AddrCount[a_prev] - AddrCount[a] + (isComplex(AddrType[a_prev])?1:0); j++)
+      aPrev = addrs[i-1]
+      for (j=0; j<AddrCount[aPrev] - AddrCount[a] + isComplex(AddrType[aPrev]); j++)
         asmJson(ends[arrPop(Stack)])
         # determine the type of current container (object/array) - for array should not issue "key"
       for (j=i; AddrCount[a]-AddrCount[aj=addrs[j]] != 1; j--) {} # descend to addr of prev segment
@@ -284,7 +289,7 @@ function tryParse(chars, res, atMost,    i,c,s) {
   s=""
   while (index(chars, c = nextChar()) > 0 &&
          (atMost==0 || i++ < atMost) &&
-         Pos <= length(In)) {
+         c != "") {
     s = s c
     Pos++
   }
@@ -316,12 +321,12 @@ function incArrIdx() { if (inArr()) PathStack[Depth]++ }
 function printRow(isStructure, v) {
   isStructure ? printStructure(v) : printGron(v)
 }
-function printStructure(v,    row,i,isArr,by_idx,segment) {
+function printStructure(v,    row,i,isArr,byIdx,segment) {
   row=""
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
-    by_idx = (isArr="array"==Stack[i]) || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
-    row = row (i==0||isArr?"":".") (isArr ? "[]" : by_idx ? segment : _unqote(segment))
+    byIdx = (isArr="array"==Stack[i]) || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
+    row = row (i==0||isArr?"":".") (isArr ? "[]" : byIdx ? segment : _unqote(segment))
   }
   if (row in AlreadyTracked) return
   AlreadyTracked[row]
@@ -348,7 +353,6 @@ function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
   if (_digit(c1 = substr(s1,i1,1)) && _digit(c2 = substr(s2,i2,1))) {
     n1 = +c1; while(_digit(c1 = substr(s1,++i1,1))) { n1 = n1 * 10 + c1 }
     n2 = +c2; while(_digit(c2 = substr(s2,++i2,1))) { n2 = n2 * 10 + c2 }
-
     return n1 == n2 ? natOrder(s1, s2, i1, i2) : _cmp(n1, n2)
   }
 
@@ -366,16 +370,16 @@ function _digit(c) { return c >= "0" && c <= "9" }
 function quicksort(data, left, right,   i, last) {
   if (left >= right)
     return
-  quicksortSwap(data, left, int((left + right) / 2))
+  _swap(data, left, int((left + right) / 2))
   last = left
   for (i = left + 1; i <= right; i++)
     if (natOrder(data[i], data[left],1,1) < 1)
-      quicksortSwap(data, ++last, i)
-  quicksortSwap(data, left, last)
+      _swap(data, ++last, i)
+  _swap(data, left, last)
   quicksort(data, left, last - 1)
   quicksort(data, last + 1, right)
 }
-function quicksortSwap(data, i, j,   temp) {
+function _swap(data, i, j,   temp) {
   temp = data[i]
   data[i] = data[j]
   data[j] = temp

@@ -236,7 +236,9 @@
 @depends_on installed_awks
   for AWK in gawk51 mawk134 bwk
   do
-    echo "Testing $AWK ..."
+    echo
+    echo "====================="
+    echo "Benchmarking $AWK ..."
 #    time cat big.json | ./soft/$AWK -f gron.awk | ./soft/$AWK -f gron.awk -- -u > /dev/null
     time cat big.json | ./soft/$AWK -f gron.awk > /dev/null
   done
