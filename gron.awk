@@ -227,7 +227,8 @@ function generateJsonAsm(   i,j,l, a,aPrev,aj,type,addrs,ends) {
   ends["object"] = "end_object"
   ends["array"]  = "end_array"
 
-  for (a in AddrType) arrPush(addrs, a)
+  for (a in AddrType)
+    arrPush(addrs, a)
   quicksort(addrs, 0, (l=arrLen(addrs))-1)
   for (i=0; i<l; i++) {
     a = addrs[i]
@@ -317,15 +318,11 @@ function generateGron(isStructure,   i, instr) {
     else { print "Error at instruction#" i ": " instr; exit 1 }
   }
 }
-
 function isSingle(s) { return "true"==s || "false"==s || "null"==s }
 function inArr() { return "array"==Stack[Depth] }
 function isEnd(s) { return "end_object"==s || "end_array"==s }
 function incArrIdx() { if (inArr()) PathStack[Depth]++ }
-
-function printRow(isStructure, v) {
-  isStructure ? printStructure(v) : printGron(v)
-}
+function printRow(isStructure, v) { isStructure ? printStructure(v) : printGron(v) }
 function printStructure(v,    row,i,isArr,byIdx,segment) {
   row=""
   for(i=1; i<=Depth; i++) {
@@ -349,11 +346,9 @@ function printGron(v,    row,i,byIdx,segment) {
   row=row "=" v
   print row
 }
-
 function _unqote(text,    l) {
   return (l=length(text)) == 2 ? "" : substr(text, 2, l-2)
 }
-
 function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
   if (_digit(c1 = substr(s1,i1,1)) && _digit(c2 = substr(s2,i2,1))) {
     n1 = +c1; while(_digit(c1 = substr(s1,++i1,1))) { n1 = n1 * 10 + c1 }
@@ -368,10 +363,8 @@ function natOrder(s1,s2, i1,i2,   c1, c2, n1,n2) {
 
   return _digit(c1) && _digit(c2) ? natOrder(s1, s2, i1, i2) : _cmp(c1, c2)
 }
-
 function _cmp(v1, v2) { return v1 > v2 ? 1 : v1 < v2 ? -1 : 0 }
 function _digit(c) { return c >= "0" && c <= "9" }
-
 function quicksort(data, left, right,   i, last) {
   if (left >= right)
     return
