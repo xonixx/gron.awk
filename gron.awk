@@ -2,7 +2,7 @@
 BEGIN { init() }
 
 function init(   i,isStructure,isUngron) {
-#  dbgA("ARGV",ARGV)
+  dbgA("ARGV",ARGV)
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
