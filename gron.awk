@@ -2,6 +2,7 @@
 BEGIN { init() }
 
 function init(   i,isStructure,isUngron) {
+  dbgA("ARGV",ARGV)
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
@@ -91,7 +92,7 @@ function gron(isStructure,   line) {
     generateGron(isStructure)
   } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
 }
-#function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) print arr[i] }
+function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) print i " : " arr[i] }
 
 # --- JSON ---
 function tryParseDigitOptional(res) { tryParse("0123456789", res); return 1 }
