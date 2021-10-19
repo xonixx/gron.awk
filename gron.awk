@@ -67,7 +67,6 @@ function ungron(   i,instr) {
   Open["array"] ="[" ; Close["array"] ="]" ; Opens["end_array"]  = "array"
   split("",Stack)
   Depth = 0
-  WasPrev = 0
   generateJson()
 }
 function gron(isStructure,   line) {
@@ -261,26 +260,26 @@ function arrPop(arr,   e,l) { e = arr[l=--arr[-7]]; if (l<0) die("Can't pop"); d
 function arrLen(arr) { return +arr[-7] }
 function die(msg) { print msg; exit 1 }
 # --- generate JSON ---
-function generateJson(   i,instr) {
+function generateJson(   i,instr,wasPrev) {
   for (i=0; i<JsonAsmLen; i++) {
     if (isComplex(instr = JsonAsm[i])) {
-      p1(Open[instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
-      Stack[++Depth]=instr; WasPrev=0 }
+      p1(wasPrev, Open[instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
+      Stack[++Depth]=instr; wasPrev=0 }
     else if ("key"==instr) {
-      p1(JsonAsm[++i] ":" (Indent==0?"":" ")); WasPrev=0 }
+      p1(wasPrev, JsonAsm[++i] ":" (Indent==0?"":" ")); wasPrev=0 }
     else if ("number"==instr || "string"==instr) {
-      p1(JsonAsm[++i]); WasPrev=1 }
+      p1(wasPrev, JsonAsm[++i]); wasPrev=1 }
     else if (isSingle(instr)) {
-      p1(instr); WasPrev=1 }
+      p1(wasPrev, instr); wasPrev=1 }
     else if (isEnd(instr)) {
       if (Stack[Depth] != Opens[instr]) die("end mismatch")
       p(nlIndent(isComplex(JsonAsm[i-1]), Depth-1) Close[Stack[Depth--]])
-      WasPrev=1 }
+      wasPrev=1 }
     else { die("Wrong opcode") }
   }
   print ""
 }
-function p1(s) { p((WasPrev ? "," nlIndent(0, Depth) : "") s) }
+function p1(wasPrev,s) { p((wasPrev ? "," nlIndent(0, Depth) : "") s) }
 function p(s) { printf "%s", s }
 function nlIndent(unless, d,   i, s) { if (unless || Indent==0) return ""; for (i=0; i<d; i++) s = s IndentStr; return "\n" s }
 # lib
