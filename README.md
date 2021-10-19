@@ -34,6 +34,23 @@ $ echo '{"a":[1,2,3]}' | ./gron.awk | ./gron.awk - -u
 }
 ```
 
+Filter part of JSON:
+```
+$ curl -s "https://api.github.com/repos/xonixx/gron.awk/commits?per_page=1" \
+     | ./gron.awk | grep "commit.author" | ./gron.awk - -u
+[
+  {
+    "commit": {
+      "author": {
+        "date": "2021-10-19T11:31:34Z",
+        "email": "xonixx@gmail.com",
+        "name": "xonix"
+      }
+    }
+  }
+]
+```
+
 [JSON structure](https://news.ycombinator.com/item?id=25009263): 
 ```
 $ curl -s 'https://ip-ranges.amazonaws.com/ip-ranges.json' | ./gron.awk - -s
