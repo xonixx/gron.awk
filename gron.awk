@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,line,isStructure,isUngron) {
+function init(   i,line,isStructure,isUngron,instr) {
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
@@ -38,21 +38,21 @@ function init(   i,line,isStructure,isUngron) {
     split("", AddrKey)   # addr -> last segment name
 
     for (i=0; i<AsmLen; i++) {
-      Instr = Asm[i]
+      instr = Asm[i]
 
-      if("record" == Instr) {
+      if("record" == instr) {
         split("",Path)
         split("",Types)
         split("",Value) # [ type, value ]
       }
-      else if (isSegmentType(Instr)) { arrPush(Types, Instr); arrPush(Path, Asm[++i]) }
-      else if ("value" == Instr) {
-        Instr = Asm[++i]
+      else if (isSegmentType(instr)) { arrPush(Types, instr); arrPush(Path, Asm[++i]) }
+      else if ("value" == instr) {
+        instr = Asm[++i]
         split("",Value)
-        Value[0] = Instr
-        if (isValueHolder(Instr))
+        Value[0] = instr
+        if (isValueHolder(instr))
           Value[1] = Asm[++i]
-      } else if ("end" == Instr) { processRecord() }
+      } else if ("end" == instr) { processRecord() }
     }
     generateJsonAsm()
     #    dbgA("--- JSON asm:",JsonAsm)
@@ -261,19 +261,19 @@ function arrPop(arr,   e,l) { e = arr[l=--arr[-7]]; if (l<0) die("Can't pop"); d
 function arrLen(arr) { return +arr[-7] }
 function die(msg) { print msg; exit 1 }
 # --- generate JSON ---
-function generateJson(   i) {
+function generateJson(   i,instr) {
   for (i=0; i<JsonAsmLen; i++) {
-    if (isComplex(Instr = JsonAsm[i])) {
-      p1(Open[Instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
-      Stack[++Depth]=Instr; WasPrev=0 }
-    else if ("key"==Instr) {
+    if (isComplex(instr = JsonAsm[i])) {
+      p1(Open[instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
+      Stack[++Depth]=instr; WasPrev=0 }
+    else if ("key"==instr) {
       p1(JsonAsm[++i] ":" (Indent==0?"":" ")); WasPrev=0 }
-    else if ("number"==Instr || "string"==Instr) {
+    else if ("number"==instr || "string"==instr) {
       p1(JsonAsm[++i]); WasPrev=1 }
-    else if (isSingle(Instr)) {
-      p1(Instr); WasPrev=1 }
-    else if (isEnd(Instr)) {
-      if (Stack[Depth] != Opens[Instr]) die("end mismatch")
+    else if (isSingle(instr)) {
+      p1(instr); WasPrev=1 }
+    else if (isEnd(instr)) {
+      if (Stack[Depth] != Opens[instr]) die("end mismatch")
       p(nlIndent(isComplex(JsonAsm[i-1]), Depth-1) Close[Stack[Depth--]])
       WasPrev=1 }
     else { die("Wrong opcode") }
