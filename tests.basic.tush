@@ -1,4 +1,6 @@
 
+XXX it appears awk 20070501 from macos-10.15 doesn't support --, so we'll use - (input file = stdin)
+
 $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json={}
 | json.a=[]
@@ -14,18 +16,18 @@ $ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk - -u
 |   }
 | }
 
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk -- -u
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk - -u
 | {
 |   "a": {
 |     "b": 2
 |   }
 | }
 
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk -- -u
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk - -u
 | Conflicting types for "x","a","b": string and number
 ? 1
 
-$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk > /tmp/1.txt; cat /tmp/1.txt | $AWK -f gron.awk -- -u
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk - -u
 | {
 |   "a": [
 |     1,
@@ -123,7 +125,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
 | json["web-app"].taglib["taglib-uri"]="cofax.tld"
 | json["web-app"].taglib["taglib-location"]="/WEB-INF/tlds/cofax.tld"
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk -- -s
+$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk - -s
 | ."web-app".servlet[]."servlet-name" = "cofaxCDS"
 | ."web-app".servlet[]."servlet-class" = "org.cofax.cds.CDSServlet"
 | ."web-app".servlet[]."init-param"."configGlossary:installationAt" = "Philadelphia, PA"
@@ -190,7 +192,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk -- -s
 | ."web-app".taglib."taglib-uri" = "cofax.tld"
 | ."web-app".taglib."taglib-location" = "/WEB-INF/tlds/cofax.tld"
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk -- -u
+$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk - -u
 | {
 |   "web-app": {
 |     "servlet": [
