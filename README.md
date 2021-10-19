@@ -1,5 +1,7 @@
 # gron.awk
 
+[![Run tests](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml/badge.svg)](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml)
+
 Similar to [tomnomnom/gron](https://github.com/tomnomnom/gron) but in Awk.
 
 Features true JSON parser in Awk.
