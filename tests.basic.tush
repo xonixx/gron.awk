@@ -6,7 +6,7 @@ $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json.a[1]=2
 | json.a[2]=3
 
-$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk -- -u
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk > /tmp/1.txt; cat /tmp/1.txt | $AWK -f gron.awk -- -u
 | {
 |   "a": [
 |     1,
