@@ -15,7 +15,9 @@ function ungron(   i,instr) {
   split("", Asm); AsmLen=0 # Gron asm
   split("", JsonAsm); JsonAsmLen=0
 
+  print 111
   while (getline In > 0) {
+    print 222
     Pos=1
 
     asm("record")
