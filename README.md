@@ -8,7 +8,7 @@ Features true JSON parser in pure Awk.
  
 Reasonably fast with Gawk/Mawk even on large-ish files. Slow with [BWK](https://github.com/onetrueawk/awk) on big JSON files (100K+).
 
-Incubated from [xonixx/awk_lab](https://github.com/xonixx/awk_lab).
+Incubated from [xonixx/awk_lab](https://github.com/xonixx/awk_lab). Developed in [xonixx/intellij-awk](https://github.com/xonixx/intellij-awk).
 
 ## Usage
 
