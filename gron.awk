@@ -262,15 +262,20 @@ function die(msg) { print msg; exit 1 }
 # --- generate JSON ---
 function generateJson(   i) {
   for (i=0; i<JsonAsmLen; i++) {
-    if (isComplex(Instr = JsonAsm[i]))           { p1(Open[Instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
-    Stack[++Depth]=Instr;                        WasPrev=0 }
-    else if ("key"==Instr)                       { p1(JsonAsm[++i] ":" (Indent==0?"":" "));         WasPrev=0 }
-    else if ("number"==Instr || "string"==Instr) { p1(JsonAsm[++i]);                                WasPrev=1 }
-    else if (isSingle(Instr))                    { p1(Instr);                                   WasPrev=1 }
-    else if (isEnd(Instr))                       { if (Stack[Depth] != Opens[Instr]) die("end mismatch")
-    p(nlIndent(isComplex(JsonAsm[i-1]), Depth-1) Close[Stack[Depth--]])
-    WasPrev=1 }
-    else                                         { die("Wrong opcode") }
+    if (isComplex(Instr = JsonAsm[i])) {
+      p1(Open[Instr] nlIndent(isEnd(JsonAsm[i+1]), Depth+1))
+      Stack[++Depth]=Instr; WasPrev=0 }
+    else if ("key"==Instr) {
+      p1(JsonAsm[++i] ":" (Indent==0?"":" ")); WasPrev=0 }
+    else if ("number"==Instr || "string"==Instr) {
+      p1(JsonAsm[++i]); WasPrev=1 }
+    else if (isSingle(Instr)) {
+      p1(Instr); WasPrev=1 }
+    else if (isEnd(Instr)) {
+      if (Stack[Depth] != Opens[Instr]) die("end mismatch")
+      p(nlIndent(isComplex(JsonAsm[i-1]), Depth-1) Close[Stack[Depth--]])
+      WasPrev=1 }
+    else { die("Wrong opcode") }
   }
   print ""
 }
@@ -301,13 +306,14 @@ function asm(inst) { Asm[AsmLen++]=inst; return 1 }
 # -----
 function generateGron(isStructure,   i, instr) {
   for (i=0; i<AsmLen; i++) {
-    if (isComplex(instr = Asm[i]))               { printRow(isStructure,"object"==instr?"{}":"[]")
-    Stack[++Depth]=instr
-    if (inArr()) { PathStack[Depth]=0 } }
-    else if (isSingle(instr))                    { printRow(isStructure,instr);               incArrIdx() }
-    else if (isEnd(instr))                       { Depth--;                incArrIdx() }
-    else if ("key" == instr)                     { PathStack[Depth]=Asm[++i];          }
-    else if ("number"==instr || "string"==instr) { printRow(isStructure,Asm[++i]);            incArrIdx() }
+    if (isComplex(instr = Asm[i])) {
+      printRow(isStructure,"object"==instr?"{}":"[]")
+      Stack[++Depth]=instr
+      if (inArr()) { PathStack[Depth]=0 } }
+    else if (isSingle(instr)) { printRow(isStructure,instr); incArrIdx() }
+    else if (isEnd(instr)) { Depth--; incArrIdx() }
+    else if ("key" == instr) { PathStack[Depth]=Asm[++i] }
+    else if ("number"==instr || "string"==instr) { printRow(isStructure,Asm[++i]); incArrIdx() }
     else { print "Error at instruction#" i ": " instr; exit 1 }
   }
 }
