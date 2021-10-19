@@ -1,97 +1,97 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,line,isStructure,isUngron,instr) {
+function init(   i,isStructure,isUngron) {
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
       break
     }
   }
+  isUngron ? ungron() : gron(isStructure)
+}
+function ungron(   i,instr) {
+  split("", Asm); AsmLen=0 # Gron asm
+  split("", JsonAsm); JsonAsmLen=0
 
-  if (isUngron) {
-    split("", Asm); AsmLen=0 # Gron asm
-    split("", JsonAsm); JsonAsmLen=0
+  while (getline In > 0) {
+    Pos=1
 
-    while (getline In > 0) {
-      Pos=1
-
-      asm("record")
-      if (STATEMENT()) {
-        asm("end")
-        if (Pos <= length(In)) {
-          print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
-          exit 1
-        }
-      } else {
+    asm("record")
+    if (STATEMENT()) {
+      asm("end")
+      if (Pos <= length(In)) {
         print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
         exit 1
       }
+    } else {
+      print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
+      exit 1
     }
-
-    # --- ungron (gron asm -> json asm) ---
-    #    dbgA("--- Gron asm:",Asm)
-
-    split("", AddrType)  # addr -> type
-    split("", AddrValue) # addr -> value
-    split("", AddrCount) # addr -> segment count
-    split("", AddrKey)   # addr -> last segment name
-
-    for (i=0; i<AsmLen; i++) {
-      instr = Asm[i]
-
-      if("record" == instr) {
-        split("",Path)
-        split("",Types)
-        split("",Value) # [ type, value ]
-      }
-      else if (isSegmentType(instr)) { arrPush(Types, instr); arrPush(Path, Asm[++i]) }
-      else if ("value" == instr) {
-        instr = Asm[++i]
-        split("",Value)
-        Value[0] = instr
-        if (isValueHolder(instr))
-          Value[1] = Asm[++i]
-      } else if ("end" == instr) { processRecord() }
-    }
-    generateJsonAsm()
-    #    dbgA("--- JSON asm:",JsonAsm)
-
-    # --- generate JSON ---
-    #    Indent = ENVIRON["Indent"] + 0
-    Indent = 2
-    for (i=0; i<Indent; i++)
-      IndentStr=IndentStr " "
-    Open["object"]="{" ; Close["object"]="}" ; Opens["end_object"] = "object"
-    Open["array"] ="[" ; Close["array"] ="]" ; Opens["end_array"]  = "array"
-    split("",Stack)
-    Depth = 0
-    WasPrev = 0
-    generateJson()
-  } else {
-    # --- parse JSON ---
-    while (getline line > 0)
-      In = In line "\n"
-
-    Pos=1
-    split("", Asm); AsmLen=0
-
-    if (ELEMENT()) {
-      if (Pos <= length(In)) {
-        print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
-        exit 1
-      }
-      #      dbgA("--- JSON asm:",Asm)
-
-      # --- generate GRON ---
-      split("",AlreadyTracked)
-      split("",Stack); split("",PathStack)
-      Depth = 0
-      generateGron(isStructure)
-    } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
   }
-}
 
+  # --- ungron (gron asm -> json asm) ---
+  #    dbgA("--- Gron asm:",Asm)
+
+  split("", AddrType)  # addr -> type
+  split("", AddrValue) # addr -> value
+  split("", AddrCount) # addr -> segment count
+  split("", AddrKey)   # addr -> last segment name
+
+  for (i=0; i<AsmLen; i++) {
+    instr = Asm[i]
+
+    if("record" == instr) {
+      split("",Path)
+      split("",Types)
+      split("",Value) # [ type, value ]
+    }
+    else if (isSegmentType(instr)) { arrPush(Types, instr); arrPush(Path, Asm[++i]) }
+    else if ("value" == instr) {
+      instr = Asm[++i]
+      split("",Value)
+      Value[0] = instr
+      if (isValueHolder(instr))
+        Value[1] = Asm[++i]
+    } else if ("end" == instr) { processRecord() }
+  }
+  generateJsonAsm()
+  #    dbgA("--- JSON asm:",JsonAsm)
+
+  # --- generate JSON ---
+  #    Indent = ENVIRON["Indent"] + 0
+  Indent = 2
+  for (i=0; i<Indent; i++)
+    IndentStr=IndentStr " "
+  Open["object"]="{" ; Close["object"]="}" ; Opens["end_object"] = "object"
+  Open["array"] ="[" ; Close["array"] ="]" ; Opens["end_array"]  = "array"
+  split("",Stack)
+  Depth = 0
+  WasPrev = 0
+  generateJson()
+}
+function gron(isStructure,   line) {
+  # --- parse JSON ---
+  while (getline line > 0)
+    In = In line "\n"
+
+  Pos=1
+  split("", Asm); AsmLen=0
+
+  if (ELEMENT()) {
+    if (Pos <= length(In)) {
+      print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
+      exit 1
+    }
+    #      dbgA("--- JSON asm:",Asm)
+
+    # --- generate GRON ---
+    split("",AlreadyTracked)
+    split("",Stack); split("",PathStack)
+    Depth = 0
+    generateGron(isStructure)
+  } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
+}
 #function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) print arr[i] }
 
 # --- JSON ---
