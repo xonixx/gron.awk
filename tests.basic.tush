@@ -220,3 +220,21 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f g
 |     ]
 |   }
 | }
+
+== make sure ungron doesn't change order ==
+$ cd "$MYDIR"; echo '[1,2,3,4,5,6,7,8,9,10,11,12]' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+| [
+|   1,
+|   2,
+|   3,
+|   4,
+|   5,
+|   6,
+|   7,
+|   8,
+|   9,
+|   10,
+|   11,
+|   12
+| ]
+
