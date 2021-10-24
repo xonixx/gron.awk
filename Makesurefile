@@ -234,11 +234,11 @@
 
 @goal timeit
 @depends_on installed_awks
-  for AWK in gawk51 mawk134 bwk
+  for AWK in gawk51 mawk134 $GOAWK bwk
   do
     echo
     echo "====================="
     echo "Benchmarking $AWK ..."
-#    time cat big.json | ./soft/$AWK -f gron.awk | ./soft/$AWK -f gron.awk -- -u > /dev/null
-    time cat big.json | ./soft/$AWK -f gron.awk > /dev/null
+#    time ./soft/$AWK -f gron.awk big.json | ./soft/$AWK -f gron.awk - -u > /dev/null
+    time ./soft/$AWK -f gron.awk big.json > /dev/null
   done

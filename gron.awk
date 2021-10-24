@@ -103,7 +103,7 @@ function NUMBER(    res) {
     asm("number") && asm(res[0])
 }
 function tryParseHex(res) { return tryParse1("0123456789ABCDEFabcdef", res) }
-function tryParseCharacters(res) { return tryParseCharacter(res) && tryParseCharacters(res) || 1 }
+function tryParseCharacters(res) { while (tryParseCharacter(res)); return 1 }
 function tryParseCharacter(res) { return tryParseSafeChar(res) || tryParseEscapeChar(res) }
 function tryParseEscapeChar(res) {
   return tryParse1("\\", res) &&
