@@ -284,8 +284,7 @@ function p(s) { printf "%s", s }
 function nlIndent(unless, d,   i, s) { if (unless || Indent==0) return ""; for (i=0; i<d; i++) s = s IndentStr; return "\n" s }
 # lib
 function tryParseExact(s,    l) {
-  l=length(s)
-  if(substr(In,Pos,l)==s) { Pos += l; return 1 }
+  if(substr(In,Pos,l=length(s))==s) { Pos += l; return 1 }
   return 0
 }
 function tryParse1(chars, res) { return tryParse(chars,res,1) }
