@@ -239,6 +239,6 @@
     echo
     echo "====================="
     echo "Benchmarking $AWK ..."
-#    time ./soft/$AWK -f gron.awk big.json | ./soft/$AWK -f gron.awk - -u > /dev/null
-    time ./soft/$AWK -f gron.awk big.json > /dev/null
+#    time ./soft/$AWK -f gron.awk test_data/big.json | ./soft/$AWK -f gron.awk - -u > /dev/null
+    time ./soft/$AWK -f gron.awk test_data/big.json > /dev/null
   done
