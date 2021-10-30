@@ -6,7 +6,7 @@ Similar to [tomnomnom/gron](https://github.com/tomnomnom/gron) but in Awk.
 
 Features true JSON parser in pure Awk.
  
-Reasonably fast with Gawk/Mawk even on large-ish files. Slow with [BWK](https://github.com/onetrueawk/awk) on big JSON files (100K+).
+Reasonably fast with Gawk/Mawk/[GoAWK](https://github.com/benhoyt/goawk) even on large-ish files. Slow with [BWK](https://github.com/onetrueawk/awk) on big JSON files (100K+).
 
 Developed in [xonixx/intellij-awk](https://github.com/xonixx/intellij-awk). Incubated from [xonixx/awk_lab](https://github.com/xonixx/awk_lab).
 
