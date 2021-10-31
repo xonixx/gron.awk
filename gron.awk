@@ -12,14 +12,15 @@ function init(   i,isStructure,isUngron) {
 }
 function gron(isStructure,   line) {
   # --- parse JSON ---
-  while (getline line > 0)
-    In = In line "\n"
+#  while (getline line > 0)
+#    In = In line "\n"
 
   Pos=1
   split("", Asm); AsmLen=0
 
   if (ELEMENT()) {
-    if (Pos <= length(In)) {
+#    if (Pos <= length(In)) {
+    if ("" != getChar()) {
       print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
       exit 1
     }
@@ -110,12 +111,12 @@ function tryParseEscapeChar(res) {
     (tryParse1("\\/bfnrt", res) || tryParse1("u", res) && tryParseHex(res) && tryParseHex(res) && tryParseHex(res) && tryParseHex(res))
 }
 function tryParseSafeChar(res,   c) {
-  c = nextChar()
+  c = getChar()
   # https://github.com/antlr/grammars-v4/blob/master/json/JSON.g4#L56
   # \x00 at end since looks like this is line terminator in macos awk(bwk?)
   if (0 == index("\"\\\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x00",c)) {
-#  if (c != "\"" && c != "\\" && c > "\x1F") {
-    Pos++
+    #  if (c != "\"" && c != "\\" && c > "\x1F") {
+    advance()
     res[0] = res[0] c
     return 1
   }
@@ -284,23 +285,54 @@ function p1(wasPrev,s) { p((wasPrev ? "," nlIndent(0, Depth) : "") s) }
 function p(s) { printf "%s", s }
 function nlIndent(unless, d,   i, s) { if (unless || Indent==0) return ""; for (i=0; i<d; i++) s = s IndentStr; return "\n" s }
 # lib
-function tryParseExact(s,    l) {
-  if(substr(In,Pos,l=length(s))==s) { Pos += l; return 1 }
-  return 0
+function tryParseExact(s,    l, i) {
+  #  if(substr(In,Pos,l=length(s))==s) { Pos += l; return 1 }
+  #  return 0
+  l=length(s)
+  for (i=1;i<=l;i++) {
+    if (getChar()!=substr(s,i,1))
+      return 0
+    advance()
+  }
+  return 1
 }
 function tryParse1(chars, res) { return tryParse(chars,res,1) }
 function tryParse(chars, res, atMost,    i,c,s) {
   s=""
-  while (index(chars, c = nextChar()) > 0 &&
+  while (index(chars, c = getChar()) > 0 &&
          (atMost==0 || i++ < atMost) &&
          c != "") {
     s = s c
-    Pos++
+    advance()
   }
   res[0] = res[0] s
   return s != ""
 }
-function nextChar() { return substr(In,Pos,1) }
+#function nextChar() { return substr(In,Pos,1) }
+function getChar(   c) {
+  if (!CurrentLine) {
+    PosInLine=1
+    if ((getline CurrentLine) <= 0) {
+      CurrentLine=""
+      return
+    }
+  }
+  c = substr(CurrentLine,PosInLine,1)
+  if (!c) { # line ended
+    # TODO line separator
+    if ((getline CurrentLine) <= 0) {
+      CurrentLine=""
+      return
+    }
+    PosInLine=1
+    c = substr(CurrentLine,PosInLine,1)
+  }
+  return c
+}
+
+function advance() {
+  PosInLine++
+}
 function asm(inst) { Asm[AsmLen++]=inst; return 1 }
 
 # -----
