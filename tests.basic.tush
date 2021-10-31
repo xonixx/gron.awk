@@ -16,6 +16,20 @@ $ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk - -u
 |   }
 | }
 
+$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk
+| json={}
+| json["Привет"]=[]
+| json["Привет"][0]="Déjà vu"
+| json["Привет"][1]="어이"
+
+$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+| {
+|   "Привет": [
+|     "Déjà vu",
+|     "어이"
+|   ]
+| }
+
 $ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk - -u
 | {
 |   "a": {
