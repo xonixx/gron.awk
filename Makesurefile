@@ -51,6 +51,11 @@
     rm -r JSONTestSuite/.git
   fi
 
+@goal test_suite
+@doc runs JSON Test Suite
+@depends_on JSONTestSuite_installed
+  ./run_json_test_suit.awk
+
 @goal soft_installed @private
 @depends_on tush_installed
 
