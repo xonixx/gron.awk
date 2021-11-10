@@ -29,9 +29,5 @@ function testFile(f,   firstLetter,cmd,res) {
 }
 
 function analyzeResult(firstLetter, res) {
-  if (res == 0 && firstLetter == "y")
-    return 1
-  if (res != 0 && firstLetter == "n")
-    return 1
-  return 0
+  return res == 0 && firstLetter == "y" || res != 0 && firstLetter == "n"
 }
