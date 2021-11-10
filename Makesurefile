@@ -40,16 +40,9 @@
 
   cd "soft"
 
-  if command -v wget >/dev/null
-  then
-    wget $JSONTestSuite_REPO/archive/master.tar.gz -O./JSONTestSuite.tar.gz
-    tar xzvf ./JSONTestSuite.tar.gz
-    rm ./JSONTestSuite.tar.gz
-    mv *-master JSONTestSuite
-  else
-    git clone --depth 1 $JSONTestSuite_REPO.git
-    rm -r JSONTestSuite/.git
-  fi
+  wget $JSONTestSuite_REPO/archive/master.tar.gz -O- \
+    | tar xzvf - JSONTestSuite-master/test_parsing JSONTestSuite-master/test_transform
+  mv JSONTestSuite-master JSONTestSuite
 
 @goal test_suite
 @doc runs JSON Test Suite

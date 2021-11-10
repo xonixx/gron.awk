@@ -1,14 +1,14 @@
 #!/usr/bin/awk -f
 BEGIN {
-  FOLDER="./soft/JSONTestSuite/test_parsing/"
-  FOLDER1="./soft/JSONTestSuite/test_transform/"
+  FOLDER1="./soft/JSONTestSuite/test_parsing/"
+  FOLDER2="./soft/JSONTestSuite/test_transform/"
   Successes = Fails = 0
   run()
 }
 
 function run() {
-  testFolder(FOLDER)
-  testFolder(FOLDER1,"y")
+  testFolder(FOLDER1)
+  testFolder(FOLDER2,"y")
   print "Successes: " Successes
   print "Fails:     " Fails
 }
