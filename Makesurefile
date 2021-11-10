@@ -1,5 +1,6 @@
 
 @define TUSH_REPO=https://github.com/adolfopa/tush
+@define JSONTestSuite_REPO=https://github.com/nst/JSONTestSuite
 @define GOAWK_VERSION=1.9.1
 @define GOAWK=goawk$GOAWK_VERSION
 @define AWK="awk"
@@ -19,7 +20,7 @@
 
   cd "soft"
 
-  if which wget >/dev/null 2>/dev/null
+  if command -v wget >/dev/null
   then
     wget $TUSH_REPO/archive/master.tar.gz -O./tush.tar.gz
     tar xzvf ./tush.tar.gz
@@ -28,6 +29,26 @@
   else
     git clone --depth 1 $TUSH_REPO.git
     rm -r tush/.git
+  fi
+
+@goal JSONTestSuite_installed @private
+@depends_on soft_folder_created
+@reached_if [[ -d "soft/JSONTestSuite" ]]
+  echo
+  echo "Fetching JSONTestSuite..."
+  echo
+
+  cd "soft"
+
+  if command -v wget >/dev/null
+  then
+    wget $JSONTestSuite_REPO/archive/master.tar.gz -O./JSONTestSuite.tar.gz
+    tar xzvf ./JSONTestSuite.tar.gz
+    rm ./JSONTestSuite.tar.gz
+    mv *-master JSONTestSuite
+  else
+    git clone --depth 1 $JSONTestSuite_REPO.git
+    rm -r JSONTestSuite/.git
   fi
 
 @goal soft_installed @private
