@@ -19,18 +19,17 @@ function gron(isStructure,   line) {
   split("", Asm); AsmLen=0
 
   if (ELEMENT()) {
-    if (Pos <= length(In)) {
-      print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
-      exit 1
-    }
-    #      dbgA("--- JSON asm:",Asm)
+    if (Pos <= length(In))
+      die("Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "...")
+      #      dbgA("--- JSON asm:",Asm)
 
-    # --- generate GRON ---
+      # --- generate GRON ---
     split("",AlreadyTracked)
     split("",Stack); split("",PathStack)
     Depth = 0
     generateGron(isStructure)
-  } else print "Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "..."
+  } else
+    die("Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "...")
 }
 function ungron(   i,instr) {
   split("", Asm); AsmLen=0 # Gron asm
@@ -42,14 +41,10 @@ function ungron(   i,instr) {
     asm("record")
     if (STATEMENT()) {
       asm("end")
-      if (Pos <= length(In)) {
-        print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
-        exit 1
-      }
-    } else {
-      print "Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "..."
-      exit 1
-    }
+      if (Pos <= length(In))
+        die("Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "...")
+    } else
+      die("Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "...")
   }
 
   # --- ungron (gron asm -> json asm) ---
@@ -114,7 +109,7 @@ function tryParseSafeChar(res,   c) {
   # https://github.com/antlr/grammars-v4/blob/master/json/JSON.g4#L56
   # \x00 at end since looks like this is line terminator in macos awk(bwk?)
   if (0 == index("\"\\\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x00",c)) {
-#  if (c != "\"" && c != "\\" && c > "\x1F") {
+    #  if (c != "\"" && c != "\\" && c > "\x1F") {
     Pos++
     res[0] = res[0] c
     return 1

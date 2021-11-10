@@ -1,6 +1,12 @@
 
 XXX it appears awk 20070501 from macos-10.15 doesn't support --, so we'll use - (input file = stdin)
 
+$ cd "$MYDIR"; echo '["a":a]' | $AWK -f gron.awk
+| Can't parse JSON at pos 5: :a]
+| ...
+? 1
+
+
 $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json={}
 | json.a=[]
