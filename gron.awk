@@ -89,21 +89,22 @@ function ungron(   i,instr) {
 #function dbgA(title,arr,   i) { print title; for(i=0;i in arr;i++) printf "%2s : %s\n", i,arr[i] }
 
 # --- JSON ---
-function tryParseDigitOptional(res) { tryParse("0123456789", res); return 1 }
+function tryParseDigits(res) { return tryParse("0123456789", res) }
 function NUMBER(    res) {
   return (tryParse1("-", res) || 1) &&
-    (tryParse1("0", res) || tryParse1("123456789", res) && tryParseDigitOptional(res)) &&
-    (tryParse1(".", res) && tryParseDigitOptional(res) || 1) &&
-    (tryParse1("eE", res) && (tryParse1("-+",res)||1) && tryParseDigitOptional(res) || 1) &&
+    (tryParse1("0", res) || tryParse1("123456789", res) && (tryParseDigits(res)||1)) &&
+    (tryParse1(".", res) ? tryParseDigits(res) : 1) &&
+    (tryParse1("eE", res) ? (tryParse1("-+",res)||1) && tryParseDigits(res) : 1) &&
     asm("number") && asm(res[0])
 }
-function tryParseHex(res) { return tryParse1("0123456789ABCDEFabcdef", res) }
-function tryParseCharacters(res) { while (tryParseCharacter(res)); return 1 }
+function tryParseHex(res) { return tryParse1("0123456789ABCDEFabcdef", res) || err(res) }
+function err(res) { res[1]=1; return 0 }
+function tryParseCharacters(res) { while (tryParseCharacter(res)); return !res[1] }
 function tryParseCharacter(res) { return tryParseSafeChar(res) || tryParseEscapeChar(res) }
 function tryParseEscapeChar(res) {
-  return tryParse1("\\", res) &&
-    (tryParse1("\\/bfnrt", res) || tryParse1("u", res) && tryParseHex(res) && tryParseHex(res) && tryParseHex(res) && tryParseHex(res))
+  return tryParse1("\\", res) ? tryParse1("\"\\/bfnrt", res) || tryParseU(res) : 0
 }
+function tryParseU(res) { return tryParse1("u", res) ? tryParseHex(res) && tryParseHex(res) && tryParseHex(res) && tryParseHex(res) : 0 }
 function tryParseSafeChar(res,   c) {
   c = nextChar()
   # https://github.com/antlr/grammars-v4/blob/master/json/JSON.g4#L56

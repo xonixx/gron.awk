@@ -71,7 +71,7 @@
 @goal prepared4tests @private
 @depends_on tush_installed debug
 
-@goal @glob tests.*.tush @private
+@goal @glob '*.tush' @private
 @depends_on prepared4tests
   f="$ITEM"
 
@@ -87,7 +87,7 @@
 
 @goal tested
 @doc run tests
-@depends_on tests.*.tush
+@depends_on '*.tush'
 
 @goal default
 @doc same as tested
