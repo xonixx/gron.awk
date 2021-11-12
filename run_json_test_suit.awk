@@ -15,7 +15,7 @@ function run() {
 }
 
 function testFolder(folder, firstLetter,   cmd,f) {
-  cmd = "ls -1 " folder
+  cmd = "ls -1 " folder " | sort"
   while (cmd | getline f) {
     testFile(folder, f, firstLetter)
   }
