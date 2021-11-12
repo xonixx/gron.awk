@@ -31,12 +31,13 @@ function testFile(folder, f, firstLetter,   cmd,res) {
   else if ("jsqry" == WHAT)
     cmd = "cat " folder f " | jsqry"
   else
-    cmd = "./soft/mawk134 -f gron.awk " folder f " 2>&1 >/dev/null"
+    cmd = "trap 'exit 7' SEGV; ./soft/mawk134 -f gron.awk " folder f
     #  cmd = "awk -f gron.awk " folder f
-    #  cmd = "./soft/bwk -f gron.awk " folder f " 2>&1 >/dev/null"
-    #  cmd = "./soft/gawk51 -f gron.awk " folder f " 2>&1 >/dev/null"
+    #  cmd = "./soft/bwk -f gron.awk " folder f
+    #  cmd = "./soft/gawk51 -f gron.awk " folder f
     #  print cmd
   cmd = cmd " >/dev/null 2>&1"
+#  cmd = cmd " >/dev/null"
   res = system(cmd)
   printf "%8s : %s\n", (res = analyzeResult(firstLetter, res)) ? "SUCCESS" : "FAIL", f
   res ? Successes++ : Fails++
