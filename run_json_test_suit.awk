@@ -15,7 +15,7 @@ function run() {
 }
 
 function testFolder(folder, firstLetter,   cmd,f) {
-  cmd = "ls -1 " folder " | sort"
+  cmd = "ls -1 " folder " | LC_COLLATE='C' sort"
   while (cmd | getline f) {
     testFile(folder, f, firstLetter)
   }
