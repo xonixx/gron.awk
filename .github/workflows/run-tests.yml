@@ -23,7 +23,7 @@ jobs:
 
       - name: "run tests"
         run: |
-          ./makesure tested_awks
+          ./makesure tested_awks tested_json_suite
 
   win:
     name: "Run tests Win"

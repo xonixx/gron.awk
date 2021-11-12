@@ -45,7 +45,7 @@
   mv JSONTestSuite-master JSONTestSuite
 
 @goal test_suite
-@doc runs JSON Test Suite
+@doc runs json suite
 @depends_on JSONTestSuite_installed
   ./run_json_test_suit.awk
 
@@ -71,19 +71,31 @@
 @goal prepared4tests @private
 @depends_on tush_installed debug
 
+@lib
+  run_tush() {
+    local f="$1"
+    export PATH="$PATH:$MYDIR/soft/tush/bin"
+
+    if DIFF="diff --strip-trailing-cr" tush-check "$f"
+    then
+      echo "TESTS PASSED : $f"
+    else
+      echo >&2 "!!! TESTS FAILED !!! : $f"
+      exit 1
+    fi
+  }
+
 @goal @glob '*.tush' @private
 @depends_on prepared4tests
-  f="$ITEM"
+@use_lib
+  run_tush "$ITEM"
 
-  export PATH="$PATH:$MYDIR/soft/tush/bin"
-
-  if DIFF="diff --strip-trailing-cr" tush-check "$f"
-  then
-    echo "TESTS PASSED : $f"
-  else
-    echo >&2 "!!! TESTS FAILED !!! : $f"
-    exit 1
-  fi
+@goal tested_json_suite
+@doc tests json suite
+@depends_on prepared4tests
+@depends_on JSONTestSuite_installed
+@use_lib
+  run_tush "run_json_test_suit.tush.txt"
 
 @goal tested
 @doc run tests
@@ -93,7 +105,7 @@
 @doc same as tested
 @depends_on tested
 
-@goal notrace @glob *.awk
+@goal notrace @glob '*.awk'
   awk '$1 !~ /^trace\(/' "$ITEM"
 
 #-------------------------------
