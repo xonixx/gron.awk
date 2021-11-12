@@ -174,7 +174,6 @@ $ cd "$MYDIR"; ./run_json_test_suit.awk
 |  SUCCESS : n_string_unescaped_tab.json
 |  SUCCESS : n_string_unicode_CapitalU.json
 |  SUCCESS : n_string_with_trailing_garbage.json
-|  SUCCESS : n_structure_100000_opening_arrays.json
 |  SUCCESS : n_structure_U+2060_word_joined.json
 |  SUCCESS : n_structure_UTF8_BOM_no_data.json
 |  SUCCESS : n_structure_angle_bracket_..json
@@ -200,7 +199,6 @@ $ cd "$MYDIR"; ./run_json_test_suit.awk
 |  SUCCESS : n_structure_object_with_trailing_garbage.json
 |  SUCCESS : n_structure_open_array_apostrophe.json
 |  SUCCESS : n_structure_open_array_comma.json
-|  SUCCESS : n_structure_open_array_object.json
 |  SUCCESS : n_structure_open_array_open_object.json
 |  SUCCESS : n_structure_open_array_open_string.json
 |  SUCCESS : n_structure_open_array_string.json
@@ -340,5 +338,5 @@ $ cd "$MYDIR"; ./run_json_test_suit.awk
 |  SUCCESS : string_3_escaped_invalid_codepoints.json
 |  SUCCESS : string_3_invalid_codepoints.json
 |  SUCCESS : string_with_escaped_NULL.json
-| Successes: 336
+| Successes: 334
 | Fails:     4
