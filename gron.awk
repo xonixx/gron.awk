@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,isStructure,isUngron,line) {
+function init(   i,isStructure,isUngron) {
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
@@ -9,8 +9,8 @@ function init(   i,isStructure,isUngron,line) {
     }
   }
   Pos=1
-  while (getline line > 0)
-    In = In line "\n"
+  RS="\x01"
+  if ((getline In) < 0) die("I/O error") # read whole input at once
 
   isUngron ? ungron() : gron(isStructure)
 }
