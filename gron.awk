@@ -9,8 +9,8 @@ function init(   i,isStructure,isUngron) {
     }
   }
   Pos=1
-  RS="\x01"
-  if ((getline In) < 0) die("I/O error") # read whole input at once
+  RS="\x01" # this allows to read whole input at once
+  if ((getline In) < 0) die("I/O error")
 
   isUngron ? ungron() : gron(isStructure)
 }
