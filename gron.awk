@@ -1,26 +1,26 @@
 #!/usr/bin/awk -f
 BEGIN { init() }
 
-function init(   i,isStructure,isUngron) {
+function init(   i,isStructure,isUngron,line) {
   for (i = 1; i < ARGC; i++) {
     if ((isUngron = "-u"==ARGV[i]) || (isStructure = "-s"==ARGV[i])) {
       delete ARGV[i]
       break
     }
   }
-  isUngron ? ungron() : gron(isStructure)
-}
-function gron(isStructure,   line) {
-  # --- parse JSON ---
+  Pos=1
   while (getline line > 0)
     In = In line "\n"
 
-  Pos=1
+  isUngron ? ungron() : gron(isStructure)
+}
+function gron(isStructure) {
+  # --- parse JSON ---
   split("", Asm); AsmLen=0
 
   if (ELEMENT()) {
     if (Pos <= length(In))
-      die("Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "...")
+      dieAtPos("Can't parse JSON")
       #      dbgA("--- JSON asm:",Asm)
 
       # --- generate GRON ---
@@ -29,26 +29,20 @@ function gron(isStructure,   line) {
     Depth = 0
     generateGron(isStructure)
   } else
-    die("Can't parse JSON at pos " Pos ": " substr(In,Pos,10) "...")
+    dieAtPos("Can't parse JSON")
 }
 function ungron(   i,instr) {
   split("", Asm); AsmLen=0 # Gron asm
   split("", JsonAsm); JsonAsmLen=0
 
-  while (getline In > 0) {
-    Pos=1
+  if (STATEMENTS()) {
+    if ("" != getChar())
+      dieAtPos("Can't parse GRON")
+  } else
+    dieAtPos("Can't parse GRON")
 
-    asm("record")
-    if (STATEMENT()) {
-      asm("end")
-      if (Pos <= length(In))
-        die("Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "...")
-    } else
-      die("Can't parse Gron at pos " Pos ": " substr(In,Pos,10) "...")
-  }
-
-  # --- ungron (gron asm -> json asm) ---
-  #  dbgA("--- Gron asm:",Asm)
+    # --- ungron (gron asm -> json asm) ---
+    #  dbgA("--- Gron asm:",Asm)
 
   split("", AddrType)  # addr -> type
   split("", AddrValue) # addr -> value
@@ -157,8 +151,17 @@ function ELEMENT() {
   return WS() && VALUE() && WS()
 }
 # --- GRON ---
+function STATEMENTS() {
+  for(;;) {
+    if (!STATEMENT())
+      return 0
+    if (!tryParse1("\n"))
+      break
+  }
+  return 1
+}
 function STATEMENT() {
-  return PATH() && WS1() && tryParse1("=") && WS1() && asm("value") && VALUE_GRON() && (tryParse1(";")||1)
+  return asm("record") && PATH() && tryParse1("=") && asm("value") && VALUE() && asm("end")
 }
 function PATH() {
   return BARE_WORD() && SEGMENTS()
@@ -254,6 +257,7 @@ function arrPush(arr, e) { arr[arr[-7]++] = e }
 function arrPop(arr,   e,l) { e = arr[l=--arr[-7]]; if (l<0) die("Can't pop"); delete arr[l]; return e }
 function arrLen(arr) { return +arr[-7] }
 function die(msg) { print msg; exit 1 }
+function dieAtPos(err) { die(err " at pos " Pos ": " substr(In,Pos,10) "...") }
 # --- generate JSON ---
 function generateJson(   i,instr,wasPrev) {
   for (i=0; i<JsonAsmLen; i++) {
