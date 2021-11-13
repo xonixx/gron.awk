@@ -27,6 +27,12 @@ $ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk
 $ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk | $AWK -f gron.awk - -u
 | "\""
 
+$ cd "$MYDIR"; printf '\n\njson.a=1\n\n\njson.b=2\n\n' | $AWK -f gron.awk - -u
+| {
+|   "a": 1,
+|   "b": 2
+| }
+
 $ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk
 | json={}
 | json["Привет"]=[]

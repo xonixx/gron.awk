@@ -152,7 +152,7 @@ function ELEMENT() {
 }
 # --- GRON ---
 function STATEMENTS() {
-  for(;nextChar();tryParse("\n")) {
+  for(tryParse("\n");nextChar();tryParse("\n")) {
     if (!STATEMENT())
       return 0
   }
