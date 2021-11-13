@@ -36,7 +36,7 @@ function ungron(   i,instr) {
   split("", JsonAsm); JsonAsmLen=0
 
   if (STATEMENTS()) {
-    if ("" != getChar())
+    if (Pos <= length(In))
       dieAtPos("Can't parse GRON")
   } else
     dieAtPos("Can't parse GRON")
@@ -152,16 +152,16 @@ function ELEMENT() {
 }
 # --- GRON ---
 function STATEMENTS() {
-  for(;;) {
+  for(;nextChar();tryParse("\n")) {
     if (!STATEMENT())
       return 0
-    if (!tryParse1("\n"))
-      break
   }
   return 1
 }
 function STATEMENT() {
-  return asm("record") && PATH() && tryParse1("=") && asm("value") && VALUE() && asm("end")
+  return asm("record") &&
+    PATH() && WS1() && tryParse1("=") && WS1() && asm("value") && VALUE_GRON() && (tryParse1(";")||1) &&
+    asm("end")
 }
 function PATH() {
   return BARE_WORD() && SEGMENTS()
@@ -257,7 +257,9 @@ function arrPush(arr, e) { arr[arr[-7]++] = e }
 function arrPop(arr,   e,l) { e = arr[l=--arr[-7]]; if (l<0) die("Can't pop"); delete arr[l]; return e }
 function arrLen(arr) { return +arr[-7] }
 function die(msg) { print msg; exit 1 }
-function dieAtPos(err) { die(err " at pos " Pos ": " substr(In,Pos,10) "...") }
+function dieAtPos(msg) { die(msg " at pos " Pos ": " posStr()) }
+function posStr(   s) { return esc(s = substr(In,Pos,10)) (10==length(s)?"...":"") }
+function esc(s) { gsub(/\n/, "\\n",s); return s }
 # --- generate JSON ---
 function generateJson(   i,instr,wasPrev) {
   for (i=0; i<JsonAsmLen; i++) {
