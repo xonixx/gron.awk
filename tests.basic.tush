@@ -22,6 +22,12 @@ $ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk - -u
 |   }
 | }
 
+$ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk
+| json="\""
+
+$ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+| "\""
+
 $ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk
 | json={}
 | json["Привет"]=[]
