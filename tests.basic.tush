@@ -5,6 +5,13 @@ $ cd "$MYDIR"; echo '["a":a]' | $AWK -f gron.awk
 | Can't parse JSON at pos 5: :a]\n
 ? 1
 
+$ cd "$MYDIR"; echo '{}a' | $AWK -f gron.awk
+| Can't parse JSON at pos 3: a\n
+? 1
+
+$ cd "$MYDIR"; echo 'a' | $AWK -f gron.awk - -u
+| Can't parse GRON at pos 2: \n
+? 1
 
 $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
 | json={}

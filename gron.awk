@@ -18,27 +18,21 @@ function gron(isStructure) {
   # --- parse JSON ---
   split("", Asm); AsmLen=0
 
-  if (ELEMENT()) {
-    if (Pos <= length(In))
-      dieAtPos("Can't parse JSON")
-      #      dbgA("--- JSON asm:",Asm)
-
-      # --- generate GRON ---
-    split("",AlreadyTracked)
-    split("",Stack); split("",PathStack)
-    Depth = 0
-    generateGron(isStructure)
-  } else
+  if (!ELEMENT() || Pos <= length(In))
     dieAtPos("Can't parse JSON")
+    #      dbgA("--- JSON asm:",Asm)
+
+    # --- generate GRON ---
+  split("",AlreadyTracked)
+  split("",Stack); split("",PathStack)
+  Depth = 0
+  generateGron(isStructure)
 }
 function ungron(   i,instr) {
   split("", Asm); AsmLen=0 # Gron asm
   split("", JsonAsm); JsonAsmLen=0
 
-  if (STATEMENTS()) {
-    if (Pos <= length(In))
-      dieAtPos("Can't parse GRON")
-  } else
+  if (!STATEMENTS() || Pos <= length(In))
     dieAtPos("Can't parse GRON")
 
     # --- ungron (gron asm -> json asm) ---
