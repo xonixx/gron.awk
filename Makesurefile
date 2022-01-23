@@ -118,7 +118,7 @@
 @depends_on tested_mawk134
 @depends_on tested_gawk51
 @depends_on tested_goawk
-@depends_on tested_goawk_branch
+#@depends_on tested_goawk_branch
 
 @goal tested_bwk @private
 @depends_on installed_bwk
