@@ -1,11 +1,12 @@
 
-@define TUSH_REPO=https://github.com/adolfopa/tush
-@define JSONTestSuite_REPO=https://github.com/nst/JSONTestSuite
-@define GOAWK_VERSION=1.9.1
-@define GOAWK=goawk$GOAWK_VERSION
-@define AWK="awk"
-
 @options timing
+
+@define TUSH_REPO='https://github.com/adolfopa/tush'
+@define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
+#@define GOAWK_VERSION='1.13.0'
+@define GOAWK_VERSION='1.9.1'
+@define GOAWK="goawk$GOAWK_VERSION"
+@define AWK='awk'
 
 @goal soft_folder_created @private
 @reached_if [[ -d "soft" ]]
@@ -133,6 +134,10 @@
 @goal tested_goawk @private
 @depends_on installed_goawk
   ./makesure -D AWK="$(pwd)/soft/$GOAWK" tested
+
+@goal tested_goawk_branch @private
+@depends_on installed_goawk_branch
+  ./makesure -D AWK="$(pwd)/soft/$GOAWK_BRANCH_EXE" tested
 
 @goal tested_mawk @private
   if [[ -x /usr/bin/mawk ]]
@@ -263,13 +268,36 @@
   mv goawk $GOAWK
   "./$GOAWK" --version
 
+@define GOAWK_BRANCH='bytecode'
+@define GOAWK_BRANCH_EXE="goawk_$GOAWK_BRANCH"
+
+@goal installed_goawk_branch @private
+@reached_if [[ -f soft/$GOAWK_BRANCH_EXE ]]
+@depends_on soft_folder_created
+  echo
+  echo "Installing GoAWK branch=$GOAWK_BRANCH ..."
+  echo
+
+  cd "soft"
+
+  zip="https://github.com/benhoyt/goawk/archive/refs/heads/$GOAWK_BRANCH.zip"
+  curl -L "$zip" -o "$GOAWK_BRANCH.zip"
+  yes | unzip "$GOAWK_BRANCH.zip"
+  cd "goawk-$GOAWK_BRANCH"
+  ~/soft/go1.17/bin/go build # TODO go path
+  mv goawk ../"$GOAWK_BRANCH_EXE"
+
+  cd ..
+  ./"$GOAWK_BRANCH_EXE" --version
+  rm -r "goawk-$GOAWK_BRANCH" "$GOAWK_BRANCH.zip"
+
 @goal timeit
 @depends_on installed_awks
-  for AWK in gawk51 mawk134 $GOAWK bwk
+  for AWK in gawk51 mawk134 $GOAWK $GOAWK_BRANCH_EXE # bwk
   do
     echo
     echo "====================="
     echo "Benchmarking $AWK ..."
 #    time ./soft/$AWK -f gron.awk test_data/big.json | ./soft/$AWK -f gron.awk - -u > /dev/null
-    time ./soft/$AWK -f gron.awk test_data/big.json > /dev/null
+    time ./soft/$AWK -f gron.awk test_data/big.json | wc -l
   done
