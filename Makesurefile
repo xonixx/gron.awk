@@ -3,8 +3,8 @@
 
 @define TUSH_REPO='https://github.com/adolfopa/tush'
 @define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
-#@define GOAWK_VERSION='1.13.0'
-@define GOAWK_VERSION='1.9.1'
+@define GOAWK_VERSION='1.13.0'
+#@define GOAWK_VERSION='1.9.1'
 @define GOAWK="goawk$GOAWK_VERSION"
 @define AWK='awk'
 
@@ -118,6 +118,7 @@
 @depends_on tested_mawk134
 @depends_on tested_gawk51
 @depends_on tested_goawk
+@depends_on tested_goawk_branch
 
 @goal tested_bwk @private
 @depends_on installed_bwk
@@ -293,7 +294,7 @@
 
 @goal timeit
 @depends_on installed_awks
-  for AWK in gawk51 mawk134 $GOAWK $GOAWK_BRANCH_EXE # bwk
+  for AWK in gawk51 mawk134 "$GOAWK -b" "$GOAWK_BRANCH_EXE -b" bwk
   do
     echo
     echo "====================="
