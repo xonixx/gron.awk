@@ -102,6 +102,17 @@
 @doc run tests
 @depends_on '*.tush'
 
+@define COVERPROFILE="/tmp/cov.txt"
+
+@goal cov_deleted @private
+  rm -f "$COVERPROFILE"
+
+@goal tested_cov
+@doc 'run tests with coverage'
+@depends_on cov_deleted
+  ./makesure tested -D AWK="/home/xonix/proj/goawk/goawk -covermode=set -coverprofile=$COVERPROFILE"
+  go tool cover -html="$COVERPROFILE"
+
 @goal default
 @doc same as tested
 @depends_on tested
