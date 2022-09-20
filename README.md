@@ -1,3 +1,5 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
+
 # gron.awk
 
 [![Run tests](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml/badge.svg)](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml)
