@@ -62,9 +62,9 @@
 
 @goal debug @private
   case "$AWK" in
-    *mawk*) "$AWK" -W version 2>&1 | head -n 1
+    *mawk*) $AWK -W version 2>&1 | head -n 1
             ;;
-         *) "$AWK" --version | head -n 1
+         *) $AWK --version | head -n 1
             ;;
   esac
   bash --version| head -n 1
@@ -110,7 +110,7 @@
 @goal tested_cov
 @doc 'run tests with coverage'
 @depends_on cov_deleted
-  ./makesure tested -D AWK="/home/xonix/proj/goawk/goawk -covermode=set -coverprofile=$COVERPROFILE"
+  ./makesure tested -D AWK="/home/xonix/proj/goawk/goawk -covermode=set -coverappend -coverprofile=$COVERPROFILE"
   go tool cover -html="$COVERPROFILE"
 
 @goal default
