@@ -1,10 +1,9 @@
-
+# vim: syntax=bash
 @options timing
 
 @define TUSH_REPO='https://github.com/adolfopa/tush'
 @define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
-@define GOAWK_VERSION='1.13.0'
-#@define GOAWK_VERSION='1.9.1'
+@define GOAWK_VERSION='1.21.0'
 @define GOAWK="goawk$GOAWK_VERSION"
 @define AWK='awk'
 
