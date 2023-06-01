@@ -1,9 +1,10 @@
 # vim: syntax=bash
 @options timing
 
-@define TUSH_REPO='https://github.com/adolfopa/tush'
+@define FHTAGN_VERSION='520262aa81bdd22f75ae0c93fe99acbbb5ae92c4'
+@define FHTAGN_URL="https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
 @define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
-@define GOAWK_VERSION='1.21.0'
+@define GOAWK_VERSION='1.22.0'
 @define GOAWK="goawk$GOAWK_VERSION"
 @define AWK='awk'
 
@@ -11,25 +12,22 @@
 @reached_if [[ -d "soft" ]]
   mkdir soft
 
-@goal tush_installed @private
+@define FHTAGN="soft/fhtagn.awk"
+
+@goal fhtagn_installed @private
 @depends_on soft_folder_created
-@reached_if [[ -f "soft/tush/bin/tush-check" ]]
-  echo
-  echo "Fetching tush..."
-  echo
-
-  cd "soft"
-
+@reached_if [[ -x "$FHTAGN" ]]
   if command -v wget >/dev/null
   then
-    wget $TUSH_REPO/archive/master.tar.gz -O./tush.tar.gz
-    tar xzvf ./tush.tar.gz
-    rm ./tush.tar.gz
-    mv tush-master tush
+    wget "$FHTAGN_URL" -O"$FHTAGN"
+  elif command -v curl >/dev/null
+  then
+    curl -L "$FHTAGN_URL" -o "$FHTAGN"
   else
-    git clone --depth 1 $TUSH_REPO.git
-    rm -r tush/.git
+    echo "can't dl fhtagn"
+    exit 2
   fi
+  chmod +x "$FHTAGN"
 
 @goal JSONTestSuite_installed @private
 @depends_on soft_folder_created
@@ -49,9 +47,6 @@
 @depends_on JSONTestSuite_installed
   ./run_json_test_suit.awk
 
-@goal soft_installed @private
-@depends_on tush_installed
-
 @goal cleaned_soft @private
 @reached_if [[ ! -d "soft" ]]
   rm -r "soft"
@@ -69,14 +64,13 @@
   bash --version| head -n 1
 
 @goal prepared4tests @private
-@depends_on tush_installed debug
+@depends_on fhtagn_installed debug
 
 @lib
-  run_tush() {
+  run_test_file() {
     local f="$1"
-    export PATH="$PATH:$MYDIR/soft/tush/bin"
 
-    if DIFF="diff --strip-trailing-cr" tush-check "$f"
+    if "./$FHTAGN" "$f"
     then
       echo "TESTS PASSED : $f"
     else
@@ -88,17 +82,17 @@
 @goal @glob '*.tush' @private
 @depends_on prepared4tests
 @use_lib
-  run_tush "$ITEM"
+  run_test_file "$ITEM"
 
 @goal tested_json_suite
-@doc tests json suite
+@doc 'tests json suite'
 @depends_on prepared4tests
 @depends_on JSONTestSuite_installed
 @use_lib
-  run_tush "run_json_test_suit.tush.txt"
+  run_test_file "run_json_test_suit.tush.txt"
 
 @goal tested
-@doc run tests
+@doc 'run tests'
 @depends_on '*.tush'
 
 @define COVERPROFILE="/tmp/cov.txt"
@@ -106,14 +100,15 @@
 @goal cov_deleted @private
   rm -f "$COVERPROFILE"
 
-@goal tested_cov
+@goal coverage
 @doc 'run tests with coverage'
+@depends_on installed_goawk
 @depends_on cov_deleted
-  ./makesure tested -D AWK="/home/xonix/proj/goawk/goawk -covermode=set -coverappend -coverprofile=$COVERPROFILE"
+  ./makesure tested -D AWK="$(pwd)/soft/$GOAWK -covermode=set -coverappend -coverprofile=$COVERPROFILE"
   go tool cover -html="$COVERPROFILE"
 
 @goal default
-@doc same as tested
+@doc 'same as tested'
 @depends_on tested
 
 @goal notrace @glob '*.awk'
