@@ -1,26 +1,26 @@
 
 XXX it appears awk 20070501 from macos-10.15 doesn't support --, so we'll use - (input file = stdin)
 
-$ cd "$MYDIR"; echo '["a":a]' | $AWK -f gron.awk
+$ cd "$MYDIR"; echo '["a":a]' | ./__awk_wrapper.sh -f gron.awk
 | Can't parse JSON at pos 5: :a]\n
 ? 1
 
-$ cd "$MYDIR"; echo '{}a' | $AWK -f gron.awk
+$ cd "$MYDIR"; echo '{}a' | ./__awk_wrapper.sh -f gron.awk
 | Can't parse JSON at pos 3: a\n
 ? 1
 
-$ cd "$MYDIR"; echo 'a' | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; echo 'a' | ./__awk_wrapper.sh -f gron.awk - -u
 | Can't parse GRON at pos 2: \n
 ? 1
 
-$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | ./__awk_wrapper.sh -f gron.awk
 | json={}
 | json.a=[]
 | json.a[0]=1
 | json.a[1]=2
 | json.a[2]=3
 
-$ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "a": {
 |     "b": 1,
@@ -28,25 +28,25 @@ $ cd "$MYDIR"; printf 'x.a.b = 1;\nx.a.c = "CCC";' | $AWK -f gron.awk - -u
 |   }
 | }
 
-$ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk
+$ cd "$MYDIR"; echo '"\""' | ./__awk_wrapper.sh -f gron.awk
 | json="\""
 
-$ cd "$MYDIR"; echo '"\""' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; echo '"\""' | ./__awk_wrapper.sh -f gron.awk | ./__awk_wrapper.sh -f gron.awk - -u
 | "\""
 
-$ cd "$MYDIR"; printf '\n\njson.a=1\n\n\njson.b=2\n\n' | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; printf '\n\njson.a=1\n\n\njson.b=2\n\n' | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "a": 1,
 |   "b": 2
 | }
 
-$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk
+$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | ./__awk_wrapper.sh -f gron.awk
 | json={}
 | json["Привет"]=[]
 | json["Привет"][0]="Déjà vu"
 | json["Привет"][1]="어이"
 
-$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | ./__awk_wrapper.sh -f gron.awk | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "Привет": [
 |     "Déjà vu",
@@ -54,18 +54,18 @@ $ cd "$MYDIR"; echo '{"Привет":["Déjà vu","어이"]}' | $AWK -f gron.awk
 |   ]
 | }
 
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b=2' | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "a": {
 |     "b": 2
 |   }
 | }
 
-$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; printf 'x.a.b=1\nx.a.b="s"' | ./__awk_wrapper.sh -f gron.awk - -u
 | Conflicting types for "x","a","b": string and number
 ? 1
 
-$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; echo '{"a":[1,2,3]}' | ./__awk_wrapper.sh -f gron.awk | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "a": [
 |     1,
@@ -74,7 +74,7 @@ $ cd "$MYDIR"; echo '{"a":[1,2,3]}' | $AWK -f gron.awk | $AWK -f gron.awk - -u
 |   ]
 | }
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
+$ cd "$MYDIR"; cat test_data/1.json | ./__awk_wrapper.sh -f gron.awk
 | json={}
 | json["web-app"]={}
 | json["web-app"].servlet=[]
@@ -163,7 +163,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk
 | json["web-app"].taglib["taglib-uri"]="cofax.tld"
 | json["web-app"].taglib["taglib-location"]="/WEB-INF/tlds/cofax.tld"
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk - -s
+$ cd "$MYDIR"; cat test_data/1.json | ./__awk_wrapper.sh -f gron.awk - -s
 | ."web-app".servlet[]."servlet-name" = "cofaxCDS"
 | ."web-app".servlet[]."servlet-class" = "org.cofax.cds.CDSServlet"
 | ."web-app".servlet[]."init-param"."configGlossary:installationAt" = "Philadelphia, PA"
@@ -230,7 +230,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk - -s
 | ."web-app".taglib."taglib-uri" = "cofax.tld"
 | ."web-app".taglib."taglib-location" = "/WEB-INF/tlds/cofax.tld"
 
-$ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; cat test_data/1.json | ./__awk_wrapper.sh -f gron.awk | grep "org." | ./__awk_wrapper.sh -f gron.awk - -u
 | {
 |   "web-app": {
 |     "servlet": [
@@ -260,7 +260,7 @@ $ cd "$MYDIR"; cat test_data/1.json | $AWK -f gron.awk | grep "org." | $AWK -f g
 | }
 
 == make sure ungron doesn't change order ==
-$ cd "$MYDIR"; echo '[1,2,3,4,5,6,7,8,9,10,11,12]' | $AWK -f gron.awk | $AWK -f gron.awk - -u
+$ cd "$MYDIR"; echo '[1,2,3,4,5,6,7,8,9,10,11,12]' | ./__awk_wrapper.sh -f gron.awk | ./__awk_wrapper.sh -f gron.awk - -u
 | [
 |   1,
 |   2,

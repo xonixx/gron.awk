@@ -4,7 +4,7 @@
 @define FHTAGN_VERSION='520262aa81bdd22f75ae0c93fe99acbbb5ae92c4'
 @define FHTAGN_URL="https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
 @define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
-@define GOAWK_VERSION='1.22.0'
+@define GOAWK_VERSION='1.23.2'
 @define GOAWK="goawk$GOAWK_VERSION"
 @define AWK='awk'
 
@@ -43,7 +43,7 @@
   mv JSONTestSuite-master JSONTestSuite
 
 @goal test_suite
-@doc runs json suite
+@doc 'runs json suite'
 @depends_on JSONTestSuite_installed
   ./run_json_test_suit.awk
 
@@ -121,7 +121,7 @@
 @depends_on tested_bwk
 @depends_on tested_mawk
 @depends_on tested_mawk134
-@depends_on tested_gawk51
+@depends_on tested_gawk @args '5.2.2' 'gawk522'
 @depends_on tested_goawk
 #@depends_on tested_goawk_branch
 
@@ -133,9 +133,9 @@
 @depends_on installed_mawk134
   ./makesure -D AWK="$(pwd)/soft/mawk134" tested
 
-@goal tested_gawk51 @private
-@depends_on installed_gawk51
-  ./makesure -D AWK="$(pwd)/soft/gawk51" tested
+@goal tested_gawk @params VERSION EXE_NAME @private
+@depends_on installed_gawk @args VERSION EXE_NAME
+  ./makesure -D AWK="$(pwd)/soft/${EXE_NAME}" -D GRON_AWKLIBPATH="$(pwd)/soft/${EXE_NAME}_libs" tested
 
 @goal tested_goawk @private
 @depends_on installed_goawk
@@ -155,9 +155,9 @@
 #-------------------------------
 
 @goal installed_awks
-@doc installs all awks into ./soft
+@doc 'installs all awks into ./soft'
 @depends_on installed_bwk
-@depends_on installed_gawk51
+@depends_on tested_gawk @args '5.2.2' 'gawk522'
 @depends_on installed_mawk134
 @depends_on installed_goawk
 
@@ -188,37 +188,39 @@
   ./bwk --version
   rm -r awk-master
 
-@goal installed_gawk51 @private
-@reached_if [[ -f soft/gawk51 ]]
+@goal installed_gawk @params VERSION EXE_NAME @private
+@reached_if [[ -f soft/"$EXE_NAME" ]]
 @depends_on soft_folder_created
-  echo
-  echo "Fetching Gawk-5.1.0..."
-  echo
+    echo
+    echo "Fetching Gawk-$VERSION..."
+    echo
 
-  cd "soft"
+    cd "soft"
 
-  G=gawk-5.1.0.tar.gz
-  wget "http://git.savannah.gnu.org/cgit/gawk.git/snapshot/$G"
-  tar xzvf "$G"
-  rm "$G"
+    G=gawk-$VERSION.tar.gz
+    dlUrl="http://git.savannah.gnu.org/cgit/gawk.git/snapshot/$G"
+    dlFolder="gawk-$VERSION"
+    wget "$dlUrl"
+    tar "${tarOpts:-xzvf}" "$G"
+    rm "$G"
 
-  echo
-  echo "Compile Gawk-5.1.0..."
-  echo
+    echo
+    echo "Compile Gawk-$VERSION..."
+    echo
 
-  cd "gawk-5.1.0"
+    cd "$dlFolder"
 
-  ./configure
-  make
-  # make check
+    ./configure
+    make
+    # make check
 
-  mv gawk ../gawk51
-  mkdir ../gawk51_libs
-  mv extension/.libs/*.so ../gawk51_libs # for AWKLIBPATH
+    mv gawk ../$EXE_NAME
+    mkdir ../${EXE_NAME}_libs
+    mv extension/.libs/*.so ../"${EXE_NAME}"_libs # for AWKLIBPATH
 
-  cd ..
-  ./gawk51 --version
-  rm -r "gawk-5.1.0"
+    cd ..
+    ./$EXE_NAME --version
+    rm -r "$dlFolder"
 
 @goal installed_mawk134 @private
 @reached_if [[ -f soft/mawk134 ]]
