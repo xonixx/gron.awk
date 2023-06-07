@@ -56,6 +56,8 @@
 
 @goal debug @private
   case "$AWK" in
+    *busybox*) $AWK --help 2>&1 | head -n 1
+            ;;
     *mawk*) $AWK -W version 2>&1 | head -n 1
             ;;
          *) $AWK --version | head -n 1
@@ -124,6 +126,7 @@
 @depends_on tested_gawk @args '5.2.2' 'gawk522'
 @depends_on tested_goawk
 #@depends_on tested_goawk_branch
+@depends_on tested_busybox
 
 @goal tested_bwk @private
 @depends_on installed_bwk
@@ -149,13 +152,11 @@
 @depends_on installed_goawk_branch
   ./makesure -D AWK="$(pwd)/soft/$GOAWK_BRANCH_EXE" tested
 
-@goal tested_mawk @private
-  if [[ -x /usr/bin/mawk ]]
-  then
-    ./makesure -D AWK="/usr/bin/mawk" tested
-  else
-    echo "No default mawk... Skipped testing it."
-  fi
+@goal tested_busybox @private
+@reached_if [[ "$OSTYPE" != "linux-gnu"* ]] # only test busybox awk on linux
+@depends_on installed_busybox
+  ./makesure -D AWK="$(pwd)/soft/busybox awk" tested
+
 #-------------------------------
 
 @goal installed_awks
@@ -276,6 +277,12 @@
 @depends_on soft_folder_created
 @use_lib mawk
   install_mawk 1.3.4 'mawk-1.3.4-20200120.tgz'
+
+@goal installed_busybox @private
+@reached_if [[ -x ./soft/busybox ]]
+  wget 'https://busybox.net/downloads/binaries/1.31.0-i686-uclibc/busybox' -O ./soft/busybox
+  chmod +x ./soft/busybox
+  echo "Installed: $(./soft/busybox | head -n 1)"
 
 @goal installed_goawk @private
 @reached_if [[ -f soft/$GOAWK ]]

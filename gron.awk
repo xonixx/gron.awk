@@ -196,7 +196,7 @@ function processRecord(   l, addr, type, value, i) {
   addr=""
   for (i=0; i<l; i++) {
     # build addr
-    addr = addr (i>0?",":"") Path[i]
+    addr = (addr) (i>0?",":"") Path[i]
     if (i<l-1) {
       type = Types[i+1] == "key" ? "object" : "array"
       value = ""
@@ -321,7 +321,7 @@ function printStructure(v,    row,i,isArr,byIdx,segment) {
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
     byIdx = (isArr="array"==Stack[i]) || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
-    row = row (i==0||isArr?"":".") (isArr ? "[]" : byIdx ? segment : _unqote(segment))
+    row = (row) (i==0||isArr?"":".") (isArr ? "[]" : byIdx ? segment : _unqote(segment))
   }
   if (row in AlreadyTracked) return
   AlreadyTracked[row]
@@ -334,7 +334,7 @@ function printGron(v,    row,i,byIdx,segment) {
   for(i=1; i<=Depth; i++) {
     segment = PathStack[i]
     byIdx = "array"==Stack[i] || segment !~ /^"[a-zA-Z$_][a-zA-Z0-9$_]*"$/
-    row= row (i==0||byIdx?"":".") (byIdx ? "[" segment "]" : _unqote(segment))
+    row= (row) (i==0||byIdx?"":".") (byIdx ? "[" segment "]" : _unqote(segment))
   }
   row=row "=" v
   print row
