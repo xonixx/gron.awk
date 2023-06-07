@@ -16,21 +16,21 @@ function init(   i,isStructure,isUngron) {
 }
 function gron(isStructure) {
   # --- parse JSON ---
-  split("", Asm); AsmLen = 0
+  delete Asm; AsmLen = 0
 
   if (!ELEMENT() || Pos <= length(In))
     dieAtPos("Can't parse JSON")
   #      dbgA("--- JSON asm:",Asm)
 
   # --- generate GRON ---
-  split("",AlreadyTracked)
-  split("",Stack); split("",PathStack)
+  delete AlreadyTracked
+  delete Stack; delete PathStack
   Depth = 0
   generateGron(isStructure)
 }
 function ungron(   i,instr) {
-  split("", Asm); AsmLen = 0 # Gron asm
-  split("", JsonAsm); JsonAsmLen = 0
+  delete Asm; AsmLen = 0 # Gron asm
+  delete JsonAsm; JsonAsmLen = 0
 
   if (!STATEMENTS() || Pos <= length(In))
     dieAtPos("Can't parse GRON")
@@ -38,23 +38,23 @@ function ungron(   i,instr) {
   # --- ungron (gron asm -> json asm) ---
   #  dbgA("--- Gron asm:",Asm)
 
-  split("", AddrType)  # addr -> type
-  split("", AddrValue) # addr -> value
-  split("", AddrCount) # addr -> segment count
-  split("", AddrKey)   # addr -> last segment name
+  delete AddrType  # addr -> type
+  delete AddrValue # addr -> value
+  delete AddrCount # addr -> segment count
+  delete AddrKey   # addr -> last segment name
 
   for (i = 0; i < AsmLen; i++) {
     instr = Asm[i]
 
     if ("record" == instr) {
-      split("",Path)
-      split("",Types)
-      split("",Value) # [ type, value ]
+      delete Path
+      delete Types
+      delete Value # [ type, value ]
     }
     else if (isSegmentType(instr)) { arrPush(Types, instr); arrPush(Path, Asm[++i]) }
     else if ("value" == instr) {
       instr = Asm[++i]
-      split("",Value)
+      delete Value
       Value[0] = instr
       if (isValueHolder(instr))
         Value[1] = Asm[++i]
@@ -70,7 +70,7 @@ function ungron(   i,instr) {
     IndentStr = IndentStr " "
   Open["object"] = "{" ; Close["object"] = "}" ; Opens["end_object"] = "object"
   Open["array"] = "[" ; Close["array"] = "]" ; Opens["end_array"] = "array"
-  split("",Stack)
+  delete Stack
   Depth = 0
   generateJson()
 }
@@ -214,7 +214,7 @@ function processRecord(   l, addr, type, value, i) {
   }
 }
 function generateJsonAsm(   i,j,l, a,aPrev,aj,type,addrs,ends) {
-  split("",Stack)
+  delete Stack
   ends["object"] = "end_object"
   ends["array"] = "end_array"
 
