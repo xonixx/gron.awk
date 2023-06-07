@@ -1,8 +1,8 @@
 #!/usr/bin/awk -f
 BEGIN {
-  WHAT=ENVIRON["WHAT"]
-  FOLDER1="./soft/JSONTestSuite/test_parsing/"
-  FOLDER2="./soft/JSONTestSuite/test_transform/"
+  WHAT = ENVIRON["WHAT"]
+  FOLDER1 = "./soft/JSONTestSuite/test_parsing/"
+  FOLDER2 = "./soft/JSONTestSuite/test_transform/"
   Successes = Fails = 0
   run()
 }
@@ -37,10 +37,10 @@ function testFile(folder, f, firstLetter,   cmd,res) {
     cmd = "cat " folder f " | jsqry"
   else
     cmd = "./soft/mawk134 -f gron.awk " folder f
-    #  cmd = "awk -f gron.awk " folder f
-    #  cmd = "./soft/bwk -f gron.awk " folder f
-    #  cmd = "./soft/gawk51 -f gron.awk " folder f
-    #  print cmd
+  #  cmd = "awk -f gron.awk " folder f
+  #  cmd = "./soft/bwk -f gron.awk " folder f
+  #  cmd = "./soft/gawk51 -f gron.awk " folder f
+  #  print cmd
   cmd = cmd " >/dev/null 2>&1"
   #  cmd = cmd " >/dev/null"
   res = system(cmd)
@@ -50,5 +50,5 @@ function testFile(folder, f, firstLetter,   cmd,res) {
 }
 
 function analyzeResult(firstLetter, res) {
-  return res == 0 && ("y" == firstLetter||"i" == firstLetter) || res != 0 && firstLetter == "n"
+  return res == 0 && ("y" == firstLetter || "i" == firstLetter) || res != 0 && firstLetter == "n"
 }
