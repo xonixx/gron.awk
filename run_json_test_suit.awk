@@ -35,11 +35,18 @@ function testFile(folder, f, firstLetter,   cmd,res) {
     cmd = "cat " folder f " | jq ."
   else if ("jsqry" == WHAT)
     cmd = "cat " folder f " | jsqry"
+  else if ("coverage" == WHAT)
+    cmd = "$AWK -f gron.awk " folder f
   else
     cmd = "./soft/mawk134 -f gron.awk " folder f
   #  cmd = "awk -f gron.awk " folder f
   #  cmd = "./soft/bwk -f gron.awk " folder f
-  #  cmd = "./soft/gawk51 -f gron.awk " folder f
+  #  cmd = "./soft/gawk522 -f gron.awk " folder f
+  #  cmd = "./soft/goawk1.8.1 -f gron.awk " folder f
+  #  cmd = "./soft/goawk1.13.0 -f gron.awk " folder f
+  #  cmd = "./soft/goawk1.21.0 -f gron.awk " folder f
+  #  cmd = "./soft/goawk1.23.2 -f gron.awk " folder f
+  #  cmd = "./soft/busybox awk -f gron.awk " folder f
   #  print cmd
   cmd = cmd " >/dev/null 2>&1"
   #  cmd = cmd " >/dev/null"

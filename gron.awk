@@ -185,7 +185,6 @@ function VALUE_GRON() {
     tryParseExact("null") && asm("null") ||
     tryParseExact("{}") && asm("object") ||
     tryParseExact("[]") && asm("array")
-
 }
 # --- ungron ---
 function isComplex(s) { return "object" == s || "array" == s }

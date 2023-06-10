@@ -1,7 +1,7 @@
 # vim: syntax=bash
 @options timing
 
-@define FHTAGN_VERSION='520262aa81bdd22f75ae0c93fe99acbbb5ae92c4'
+@define FHTAGN_VERSION='904e7833d9866b1b2a3e7a0c75d84dd159c7297a'
 @define FHTAGN_URL="https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
 @define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
 @define GOAWK_VERSION='1.23.2'
@@ -93,6 +93,13 @@
 @use_lib
   run_test_file "run_json_test_suit.tush.txt"
 
+@goal tested_json_suite_coverage
+@doc 'tests json suite for coverage'
+@depends_on prepared4tests
+@depends_on JSONTestSuite_installed
+@use_lib
+  WHAT=coverage run_test_file "run_json_test_suit_coverage.tush.txt"
+
 @goal tested
 @doc 'run tests'
 @depends_on '*.tush'
@@ -106,7 +113,7 @@
 @doc 'run tests with coverage'
 @depends_on installed_goawk
 @depends_on cov_deleted
-  ./makesure tested -D AWK="$(pwd)/soft/$GOAWK -covermode=set -coverappend -coverprofile=$COVERPROFILE"
+  ./makesure tested tested_json_suite_coverage -D AWK="$(pwd)/soft/$GOAWK -covermode=set -coverappend -coverprofile=$COVERPROFILE"
   go tool cover -html="$COVERPROFILE"
 
 @goal default
