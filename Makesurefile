@@ -1,18 +1,18 @@
 # vim: syntax=bash
 @options timing
 
-@define FHTAGN_VERSION='904e7833d9866b1b2a3e7a0c75d84dd159c7297a'
-@define FHTAGN_URL="https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
-@define JSONTestSuite_REPO='https://github.com/nst/JSONTestSuite'
-@define GOAWK_VERSION='1.23.2'
-@define GOAWK="goawk$GOAWK_VERSION"
-@define AWK='awk'
+@define FHTAGN_VERSION 'v0.1.0'
+@define FHTAGN_URL     "https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
+@define JSONTestSuite_REPO 'https://github.com/nst/JSONTestSuite'
+@define GOAWK_VERSION '1.23.2'
+@define GOAWK         "goawk$GOAWK_VERSION"
+@define AWK 'awk'
 
 @goal soft_folder_created @private
 @reached_if [[ -d "soft" ]]
   mkdir soft
 
-@define FHTAGN="soft/fhtagn.awk"
+@define FHTAGN "soft/fhtagn.awk"
 
 @goal fhtagn_installed @private
 @depends_on soft_folder_created
@@ -104,7 +104,7 @@
 @doc 'run tests'
 @depends_on '*.tush'
 
-@define COVERPROFILE="/tmp/cov.txt"
+@define COVERPROFILE "/tmp/cov.txt"
 
 @goal cov_deleted @private
   rm -f "$COVERPROFILE"
@@ -317,8 +317,8 @@
   mv goawk $GOAWK
   "./$GOAWK" --version
 
-@define GOAWK_BRANCH='bytecode'
-@define GOAWK_BRANCH_EXE="goawk_$GOAWK_BRANCH"
+@define GOAWK_BRANCH     'bytecode'
+@define GOAWK_BRANCH_EXE "goawk_$GOAWK_BRANCH"
 
 @goal installed_goawk_branch @private
 @reached_if [[ -f soft/$GOAWK_BRANCH_EXE ]]
