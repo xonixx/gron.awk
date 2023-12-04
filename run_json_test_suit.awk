@@ -1,8 +1,9 @@
 #!/usr/bin/awk -f
 BEGIN {
   if (!(WHAT = ENVIRON["WHAT"])) {
-    if (!(AWK = ENVIRON["AWK"])) {
-      AWK = "awk"
+    if(!(AWK = ENVIRON["AWK"])||"awk"==AWK) {
+      print "must set AWK"
+      exit 1
     }
   }
   FOLDER1 = "./soft/JSONTestSuite/test_parsing/"

@@ -107,10 +107,11 @@
 @doc 'tests json suite'
 @depends_on prepared4tests
 @depends_on JSONTestSuite_installed
+@depends_on installed_mawk134
 @use_lib
-  run_test_file "run_json_test_suit.tush.txt"
+  AWK="$(pwd)/soft/mawk134" run_test_file "run_json_test_suit.tush.txt"
 
-@goal tested_json_suite_coverage
+@goal tested_json_suite_coverage @private
 @doc 'tests json suite for coverage'
 @depends_on prepared4tests
 @depends_on JSONTestSuite_installed
