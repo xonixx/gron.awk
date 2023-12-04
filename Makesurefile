@@ -115,7 +115,7 @@
 @depends_on prepared4tests
 @depends_on JSONTestSuite_installed
 @use_lib
-  WHAT=coverage run_test_file "run_json_test_suit_coverage.tush.txt"
+  run_test_file "run_json_test_suit_coverage.tush.txt"
 
 @goal tested
 @doc 'run tests'
