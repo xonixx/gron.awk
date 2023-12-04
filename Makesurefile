@@ -42,9 +42,26 @@
     | tar xzvf - JSONTestSuite-master/test_parsing JSONTestSuite-master/test_transform
   mv JSONTestSuite-master JSONTestSuite
 
-@goal test_suite
+@goal test_suite_mawk134
+@depends_on installed_mawk134
+@depends_on test_suite @args './soft/mawk134'
+
+@goal test_suite_bwk
+@depends_on installed_bwk
+@depends_on test_suite @args './soft/bwk'
+
+#@goal test_suite_busybox
+#@depends_on installed_busybox
+#@depends_on test_suite @args './soft/busybox awk'
+
+@goal test_suite_goawk
+@depends_on installed_goawk
+@depends_on test_suite @args "./soft/$GOAWK"
+
+@goal test_suite @params AWK @private
 @doc 'runs json suite'
 @depends_on JSONTestSuite_installed
+  export AWK
   ./run_json_test_suit.awk
 
 @goal cleaned_soft @private
