@@ -161,7 +161,7 @@
 @depends_on tested_bwk
 @depends_on tested_mawk133
 @depends_on tested_mawk134
-@depends_on tested_gawk @args '5.2.2' 'gawk522'
+@depends_on tested_gawk @args '5.3.0' 'gawk530'
 @depends_on tested_goawk
 #@depends_on tested_goawk_branch
 @depends_on tested_busybox
