@@ -1,10 +1,10 @@
 # vim: syntax=bash
 @options timing
 
-@define FHTAGN_VERSION 'v0.1.0'
+@define FHTAGN_VERSION 'v0.1.1'
 @define FHTAGN_URL     "https://github.com/xonixx/fhtagn/raw/$FHTAGN_VERSION/fhtagn.awk"
 @define JSONTestSuite_REPO 'https://github.com/nst/JSONTestSuite'
-@define GOAWK_VERSION '1.23.2'
+@define GOAWK_VERSION '1.25.0'
 @define GOAWK         "goawk$GOAWK_VERSION"
 @define AWK 'awk'
 
@@ -124,15 +124,28 @@
 
 @define COVERPROFILE "/tmp/cov.txt"
 
-@goal cov_deleted @private
-  rm -f "$COVERPROFILE"
-
 @goal coverage
 @doc 'run tests with coverage'
-@depends_on installed_goawk
-@depends_on cov_deleted
-  ./makesure tested tested_json_suite_coverage -D AWK="$(pwd)/soft/$GOAWK -covermode=set -coverappend -coverprofile=$COVERPROFILE"
+@depends_on _cover_profile_prepared
   go tool cover -html="$COVERPROFILE"
+
+@goal _cover_profile_deleted @private
+  rm -f "$COVERPROFILE"
+
+@goal _cover_profile_prepared @private
+@depends_on installed_goawk
+@depends_on _cover_profile_deleted
+  ./makesure tested tested_json_suite_coverage -D AWK="$(pwd)/soft/$GOAWK -covermode=set -coverappend -coverprofile=$COVERPROFILE"
+
+@goal coverage_badge_updated
+@doc 'updates code coverage badge'
+@depends_on _cover_profile_prepared
+  html='/tmp/cov.html'
+  go tool cover -html="$COVERPROFILE" -o "$html"
+  coverage="$(awk '/gron\.awk/ { if (match($0,/\(.+\)/)) print substr($0,RSTART+1,RLENGTH-2) }' "$html")"
+  echo "coverage: $coverage"
+  awk -v coverage="$coverage" '{ gsub(/\$COVERAGE/,coverage) } 1' coverage.tpl.svg > coverage.svg
+  rm "$html"
 
 @goal default
 @doc 'same as tested'

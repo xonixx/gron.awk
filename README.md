@@ -3,6 +3,7 @@
 # gron.awk
 
 [![Run tests](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml/badge.svg)](https://github.com/xonixx/gron.awk/actions/workflows/run-tests.yml)
+![coverage](coverage.svg)
 
 Similar to [tomnomnom/gron](https://github.com/tomnomnom/gron) but in Awk.
 
