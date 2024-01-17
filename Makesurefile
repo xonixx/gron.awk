@@ -195,6 +195,10 @@
 @depends_on installed_busybox
   ./makesure -D AWK="$(pwd)/soft/busybox awk" tested
 
+@goal tested_jawk @private
+@depends_on installed_jawk
+  ./makesure -D AWK="java -jar $(pwd)/soft/$JAWK_JAR" tested
+
 #-------------------------------
 
 @goal installed_awks
@@ -321,6 +325,13 @@
   wget 'https://busybox.net/downloads/binaries/1.31.0-i686-uclibc/busybox' -O ./soft/busybox
   chmod +x ./soft/busybox
   echo "Installed: $(./soft/busybox | head -n 1)"
+
+@define JAWK_VER '3.1.00'
+@define JAWK_JAR "jawk-$JAWK_VER-standalone.jar"
+
+@goal installed_jawk @private
+@reached_if [[ -e ./soft/"$JAWK_JAR" ]]
+  wget "https://github.com/sentrysoftware/Jawk/releases/download/v$JAWK_VER/$JAWK_JAR" -O ./soft/"$JAWK_JAR"
 
 @goal installed_goawk @private
 @reached_if [[ -f soft/$GOAWK ]]
