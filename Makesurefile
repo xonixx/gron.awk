@@ -82,6 +82,18 @@
   esac
   bash --version| head -n 1
 
+@goal debug_pg @params AWK @private
+  printf '%s: ' "$AWK"
+  case "$AWK" in
+    *busybox*) $AWK --help 2>&1 | head -n 1
+            ;;
+    *mawk*) $AWK -W version 2>&1 | head -n 1
+            ;;
+         *) $AWK --version | head -n 1
+            ;;
+  esac
+
+
 @goal prepared4tests @private
 @depends_on fhtagn_installed debug
 
@@ -98,8 +110,9 @@
     fi
   }
 
-@goal @glob '*.tush' @private
-@depends_on prepared4tests
+@goal @glob '*.tush' @params AWK @private
+@depends_on fhtagn_installed
+@depends_on debug_pg @args AWK
 @use_lib
   run_test_file "$ITEM"
 
@@ -120,7 +133,7 @@
 
 @goal tested
 @doc 'run tests'
-@depends_on '*.tush'
+@depends_on '*.tush' @args 'awk'
 
 @define COVERPROFILE "/tmp/cov.txt"
 
@@ -168,36 +181,37 @@
 
 @goal tested_bwk @private
 @depends_on installed_bwk
-  ./makesure -D AWK="$(pwd)/soft/bwk" tested
+@depends_on '*.tush' @args './soft/bwk'
 
 @goal tested_mawk133 @private
 @depends_on installed_mawk133
-  ./makesure -D AWK="$(pwd)/soft/mawk133" tested
+@depends_on '*.tush' @args './soft/mawk133'
 
 @goal tested_mawk134 @private
 @depends_on installed_mawk134
-  ./makesure -D AWK="$(pwd)/soft/mawk134" tested
+@depends_on '*.tush' @args './soft/mawk134'
 
 @goal tested_gawk @params VERSION EXE_NAME @private
 @depends_on installed_gawk @args VERSION EXE_NAME
-  ./makesure -D AWK="$(pwd)/soft/${EXE_NAME}" -D GRON_AWKLIBPATH="$(pwd)/soft/${EXE_NAME}_libs" tested
+@depends_on '*.tush' @args "./soft/$EXE_NAME" # TODO GRON_AWKLIBPATH
+#  ./makesure -D AWK="$(pwd)/soft/${EXE_NAME}" -D GRON_AWKLIBPATH="$(pwd)/soft/${EXE_NAME}_libs" tested
 
 @goal tested_goawk @private
 @depends_on installed_goawk
-  ./makesure -D AWK="$(pwd)/soft/$GOAWK" tested
+@depends_on '*.tush' @args "./soft/$GOAWK"
 
 @goal tested_goawk_branch @private
 @depends_on installed_goawk_branch
-  ./makesure -D AWK="$(pwd)/soft/$GOAWK_BRANCH_EXE" tested
+@depends_on '*.tush' @args "./soft/$GOAWK_BRANCH_EXE"
 
 @goal tested_busybox @private
 @reached_if [[ "$OSTYPE" != "linux-gnu"* ]] # only test busybox awk on linux
 @depends_on installed_busybox
-  ./makesure -D AWK="$(pwd)/soft/busybox awk" tested
+@depends_on '*.tush' @args "./soft/busybox awk"
 
 @goal tested_jawk @private
 @depends_on installed_jawk
-  ./makesure -D AWK="java -jar $(pwd)/soft/$JAWK_JAR" tested
+@depends_on '*.tush' @args "java -jar ./soft/$JAWK_JAR"
 
 #-------------------------------
 
